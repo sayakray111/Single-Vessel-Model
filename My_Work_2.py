@@ -1,26 +1,20 @@
 #!/usr/bin/env python
-
 import os
 import numpy as np
 import time
-
-#import placentagen as pg
+import placentagen as pg
 from opencmiss.iron import iron
 el_type = 2
 
-nel_x = 1
-nel_y = 1
-nel_z = 1
+nel_x = 10
+nel_y = 10
+nel_z = 10
 
-
-
-#iron.DiagnosticsSetOn(iron.DiagnosticTypes.ALL,[1,2,3,4,5],"Diagnostics_Darcy",[""])
-
-export_mesh = True
+export_mesh = False
 filename_mesh = 'expected-results/placenta_mesh'
 
 export_results = True
-export_directory = '/hpc/sray036/VirtualPregnancy/repro-examples/uteroplacental/darcy-models/02-darcy-ell-full'
+export_directory = 'output'
 
 porosity = 1.0
 perm_over_vis = 1.0 # permiability over vicosity
@@ -123,7 +117,6 @@ equationsSet.CreateFinish()
 dependentField = iron.Field()
 equationsSet.DependentCreateStart(dependentFieldUserNumber,dependentField)
 dependentField.VariableLabelSet(iron.FieldVariableTypes.U, "Dependent")
-
 #dependentField.ComponentMeshComponentSet(iron.FieldVariableTypes.U, 1, 1)
 #dependentField.ComponentMeshComponentSet(iron.FieldVariableTypes.U, 2, 1)
 #dependentField.ComponentMeshComponentSet(iron.FieldVariableTypes.U, 3, 1)
@@ -155,7 +148,6 @@ equationsSet.EquationsCreateStart(equations)
 equations.sparsityType = iron.EquationsSparsityTypes.SPARSE
 equations.outputType = iron.EquationsOutputTypes.NONE
 equationsSet.EquationsCreateFinish()
-print('Entering Create equations')
 
 # Create Darcy equation problem
 problem = iron.Problem()
@@ -164,7 +156,6 @@ problemSpecification = [iron.ProblemClasses.FLUID_MECHANICS,
         iron.ProblemSubtypes.STANDARD_DARCY]
 problem.CreateStart(problemUserNumber, problemSpecification)
 problem.CreateFinish()
-print('Entering  Create Darcy equation problem')
 
 # Create control loops
 problem.ControlLoopCreateStart()
@@ -180,7 +171,6 @@ solver.linearType = iron.LinearSolverTypes.ITERATIVE
 solver.linearIterativeAbsoluteTolerance = 1.0E-13
 solver.linearIterativeRelativeTolerance = 1.0E-13
 problem.SolversCreateFinish()
-print('Entering  Create Darcy problem solver')
 
 ## Create solver equations and add equations set to solver equations
 solver = iron.Solver()
@@ -202,7 +192,6 @@ Total_Nodes = nodes.NumberOfNodesGet()
 ##Putting Boundary conditions
 f_val = []
 Node_Number = []
-Node_Number1 = []
 f_val1 = []
 f_val2 = []
 f_val3 = []
@@ -210,40 +199,23 @@ z_val = 0
 x_val = 0
 y_val = 0
 k = 0
-k1=0
 for i in range(1,Total_Nodes):
     z_val = geometricField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,i,3)
     x_val = geometricField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,i,1)
     y_val = geometricField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,i,2)
-    if(z_val == 0 or z_val == 1 or y_val == 0 or y_val == 1 or x_val == 1 or x_val == 0):
+    if(z_val == 0 or z_val == 1 or y_val == 0 or y_val == 1 or x_val == 0 or x_val == 1):
         Node_Number.append(i)
         f_val.append(x_val*y_val*z_val)
-        k1 = k1+1
-
-for i1 in range(1,Total_Nodes):
-    z_val = geometricField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,i,3)
-    x_val = geometricField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,i,1)
-    y_val = geometricField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,i,2)
-    if(z_val == 0 or z_val == 1 or y_val == 0 or y_val == 1 or x_val == 1 or x_val == 0):
-        Node_Number1.append(i)
         f_val1.append(y_val*z_val)
         f_val2.append(x_val*z_val)
         f_val3.append(y_val*x_val)
         k = k+1
-
-print('Total nodes in boundary = ', k )
-
-
 for j in range(0,k):
-    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number1[j],1,iron.BoundaryConditionsTypes.FIXED,f_val1[j])
-    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number1[j],2,iron.BoundaryConditionsTypes.FIXED,f_val2[j])
-    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number1[j],3,iron.BoundaryConditionsTypes.FIXED,f_val3[j])
+    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number[j],1,iron.BoundaryConditionsTypes.FIXED,-f_val1[j])
+    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number[j],2,iron.BoundaryConditionsTypes.FIXED,-f_val2[j])
+    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number[j],3,iron.BoundaryConditionsTypes.FIXED,-f_val3[j])
+    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number[j],4,iron.BoundaryConditionsTypes.FIXED,f_val[j])
 
-
-for j1 in range(0,k1):
-    boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Node_Number[j1],4,iron.BoundaryConditionsTypes.FIXED,f_val[j1])
-
-print('Last node number in mesh= ', Total_Nodes )
 
 boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Total_Nodes,1,iron.BoundaryConditionsTypes.FIXED,1)
 boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Total_Nodes,2,iron.BoundaryConditionsTypes.FIXED,1)
@@ -251,7 +223,6 @@ boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Total_No
 boundaryConditions.SetNode(dependentField,iron.FieldVariableTypes.U,1,1,Total_Nodes,4,iron.BoundaryConditionsTypes.FIXED,1)
     
 solverEquations.BoundaryConditionsCreateFinish()
-
 start_time = time.time()
 #print(dependentField.ParameterSetGetNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,iron.GlobalDerivativeConstants.NO_GLOBAL_DERIV,27,1))
 # Solve the problem
@@ -262,16 +233,16 @@ print ('Total time for solve = '+ str((end_time-start_time)/60.0) + ' mins')
 
 
 #if(export_results):
-#    if not os.path.exists(export_directory):
-#        os.makedirs(export_directory)
-#        ## Export results
-#    export_file = export_directory + '/output/StaticDarcy'
-#    fields = iron.Fields()
-#    fields.CreateRegion(region)
-#    fields.NodesExport(export_file,"FORTRAN")
-#    fields.ElementsExport(export_file,"FORTRAN")
-#    fields.Finalise()
-#
+    #if not os.path.exists(export_directory):
+        #os.makedirs(export_directory)
+        ## Export results
+    #export_file = export_directory + '/StaticDarcy'
+    #fields = iron.Fields()
+    #fields.CreateRegion(region)
+    #fields.NodesExport(export_file,"FORTRAN")
+    #fields.ElementsExport(export_file,"FORTRAN")
+    #fields.Finalise()
+
 
 iron.Finalise()
 raise SystemExit
