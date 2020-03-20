@@ -236,7 +236,7 @@ while(Pres<=198.5):
     
     Diam_lac1 = Diam_lac + (2*d_t)
     Diam_sac1 = Diam_sac + (2*d_t)
-	Diam_c1 = Diam_c + (2*d_t)
+    Diam_c1 = Diam_c + (2*d_t)
     vol_a = np.pi * 0.25 * (Diam_a1 * Diam_a1) * l_a * n_a
     vol_la = np.pi * 0.25 * (Diam_la1 * Diam_la1) * l_la * n_la
     vol_sa = np.pi * 0.25 * (Diam_sa1 * Diam_sa1) * l_sa * n_sa
@@ -261,14 +261,16 @@ Test_Diameter = []
 Test_perfusion= []
 gradP_100 = ((70.9/6000)*(Resistance_total100)*vol_100)/133
 print(gradP_100)
-for d in csv.DictReader(open('C:/Users/ASUS/Desktop/Photos/My_Work/perfusion(passive).csv')):
+for d in csv.DictReader(open('C:/Users/ASUS/Desktop/Photos/My_Work/Carlson(2008)_dataP.csv')):
     Test_Pressure.append(float(d['Pressure']))
-    Test_perfusion.append(float(d['Perfusion']))
+    Test_perfusion.append(float(d['Diameter']))
 
 print('Pressure = ', Test_Pressure)
 print('Diameter = ', Test_Diameter)
 plt.xlim(0,200)
-plt.ylim(0,3)
+plt.ylim(0,180)
+plt.xlabel('Pressure(mmHg)')
+plt.ylabel('Diameter(micrometer)')
 plt.plot(Test_Pressure,Test_perfusion,'b')
-plt.plot(Pressure_in,perfusion_norm,'r')
+plt.plot(Pressure_la,Diameter_la,'r')
 plt.show()
