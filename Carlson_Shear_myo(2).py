@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 import math
 import csv
 import scipy.io
+import os.path
+
+path = os.path.abspath('DAnometa2vals.mat')
+
+mat = scipy.io.loadmat(path)
 mat = scipy.io.loadmat('C:/Users/ASUS/Desktop/Photos/My_Work/DAnometa2vals.mat')
 Pvc = float(mat.get('Pvc')/1333)
 Pac = float(mat.get('Pac')/1333)
