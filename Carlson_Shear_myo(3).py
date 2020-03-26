@@ -5,10 +5,8 @@ import math
 import csv
 import scipy.io
 import os.path
-from pathlib import Path,PureWindowsPath
-path = os.path.abspath('/Desktop/Photos/My_Work/DAnometa2vals.mat')
-print(path)
-full_path = PureWindowsPath(folder) / "DAnometa2vals.mat"
+
+full_path =  ".DAnometa2vals.mat"
 #mat = scipy.io.loadmat(path)
 #Pvc = float(mat.get('Pvc')/1333)
 #Pac = float(mat.get('Pac')/1333)
