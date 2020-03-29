@@ -7,7 +7,7 @@ import scipy.io
 import os.path
 from pathlib import Path
 
-mat = scipy.io.loadmat('C:/Users/ASUS/Desktop/Photos/My_Work/DAnometa2vals.mat')
+mat = scipy.io.loadmat('.DAnometa2vals.mat')
 Pvc = float(mat.get('Pvc') / 1333)
 Pac = float(mat.get('Pac') / 1333)
 #calculate the value of Q to be used for the evaluation of shear stress
@@ -246,7 +246,7 @@ Test_Diameter = []
 Test_perfusion= []
 gradP_100 = ((70.9/6000)*(Resistance_total100)*vol_100)/133
 print(gradP_100)
-for d in csv.DictReader(open('C:/Users/ASUS/Desktop/Photos/My_Work/perfusion(passive).csv')):
+for d in csv.DictReader(open('.perfusion(passive).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 
