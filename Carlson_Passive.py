@@ -242,6 +242,7 @@ while(Pres<=200):
 
 perfusion_norm = [(k/perfuse_100) for k in perfusion]
 Test_Pressure = []
+Test_Pressure1=[]
 Test_Diameter = []
 Test_perfusion= []
 gradP_100 = ((70.9/6000)*(Resistance_total100)*vol_100)/133
@@ -249,13 +250,23 @@ print(gradP_100)
 for d in csv.DictReader(open('perfusion(passive).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
+for d1 in csv.DictReader(open('.Carlson(2008)_dataP.csv')):
+    Test_Pressure1.append(float(d1['Pressure']))
+    Test_Diameter.append(float(d1['Diameter']))
 
-print('Pressure = ', Test_Pressure)
-print('Diameter = ', Test_Diameter)
+plt.figure(figsize=(10,9))
+plt.subplot(211)
 plt.xlim(0,200)
 plt.ylim(0,3)
 plt.xlabel('Pressure(mmHg)')
-plt.ylabel('Diameter(micrometer)')
+plt.ylabel('perfusion')
 plt.plot(Test_Pressure,Test_perfusion,'b')
 plt.plot(Pressure_in,perfusion_norm,'r')
+plt.subplot(212)
+plt.xlim(0,200)
+plt.ylim(0,180)
+plt.xlabel('Pressure(mmHg)')
+plt.ylabel('Diameter')
+plt.plot(Test_Pressure1,Test_Diameter,'b')
+plt.plot(Pressure_la,Diameter_la,'r')
 plt.show()
