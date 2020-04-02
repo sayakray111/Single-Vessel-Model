@@ -250,6 +250,7 @@ while(Pres<=200):
     
 
     #why redefine d_t every loop? move calculation of all updated diameters here
+    #I do not recall you discussing this at all in your description of this model
 
     # Here the diameters have been converted to their total values which considers the amount of tissue covering the vessels
     d_t = 18.8*1e-6
