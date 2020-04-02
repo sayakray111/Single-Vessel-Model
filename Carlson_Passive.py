@@ -164,17 +164,19 @@ while(Pres<=200):
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v
-    #Resistance_totalc = Resistance_totalc + Resistance_a + Resistance_v
     Q_tot = gradP_tot/Resistance_total
-    #Rat = ((Pres-Pvc)/(Pac-Pvc))
-    #Explain what is happening in the next two lines
+
+    ## These are calculations with respect to the large arteriole.... 
+    ## The parameters used here to calculate the large arteriole diameter corresponding to a particular large arteriole midpoint pressure
     P1 = (Pres*133.333)-(Q_tot*Resistance_a)
     P2 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)
     #P2 = P2 + (Q_tot*Resistance_v)
+    ## The mid point pressure for the large arteriole.... (P_la)
     P_la = (P1+P2)*0.5
     D111 = P_la
     
     #define these parameters outside the loop and name them for their artery, make them inputs to your tension function
+    ## All the following parameters are for the large arteriole....
     Cpass = 1.043
     Cpassd = 8.293
     Cact = 1.596
@@ -188,21 +190,21 @@ while(Pres<=200):
     D0 = 156.49 * 1e-6
     N1 = n_la
     vis_1 = vis_la
-    
     Diam_la = fsolve(Tension2,Diam_la,args=D111)
     
     #what is this diameter?
     Diam_la1 = Diam_la+(2*d_t)
-    #what is this loop doing and why?
     k = Tension2(Diam_la,D111)
+    # Check if solution has converged if not repeat the problem with that value...
     if(abs(k)>0.00008):
         Diam_la = Diam_la+0.000001
         print(Pres)
         continue
         
-    #small arteriole...
     #define these parameters outside the loop and name them for their artery, make them inputs to your tension function
-
+    ## These are calculations with respect to the small arteriole.... 
+    ## The parameters used here to calculate the small arteriole diameter corresponding to a particular small arteriole midpoint pressure
+    #parameters for the small arteriole...
     Cpass = 0.2599
     Cpassd = 11.467
     Cact = 0.274193
@@ -223,32 +225,40 @@ while(Pres<=200):
     P_sa = (P11+P22)*0.5
     
     D111 = P_sa
+    ## The mid point pressure for the small arteriole.... (P_sa)
     vis_1 = vis_sa
     #X0 = Dekkers(Tension2,0,0.00005,D111) #delete lines you dont use
+    ## Solve for the small arteriole diameter....
     Diam_sa = fsolve(Tension2,Diam_sa,args=D111)
     #hy is the line below there?
     Diam_sa1 = Diam_sa+(2*d_t)
     #what is this loop supposed to do?
     k = Tension2(Diam_sa,D111)
+    # Check if solution has converged if not repeat the problem with that value...
     if(abs(k)>0.00008):
         Diam_sa = Diam_sa+0.000001
         print(Pres)
         continue
         
+    ## Store the values of the input pressure and the Diameters of the large and small arterioles.
     Pressure_in.append(Pres)
     Pressure_la.append(P_la/133.33)
     Diameter_la.append(Diam_la * 1e06)
     Pressure_sa.append(P_sa/133.33)
     Diameter_sa.append(Diam_sa*1e06)
     
-    #a lot of the below looks to me to be repeated, do all this together, why redefine d_t every loop?
+    
+
+    #why redefine d_t every loop? move calculation of all updated diameters here
+
+    # Here the diameters have been converted to their total values which considers the amount of tissue covering the vessels
     d_t = 18.8*1e-6
-    #Explain why you are adding 2*dt to all your diameters, this is not in your write up
     Diam_a1 = Diam_a+(2*d_t)
     Diam_lac1 = Diam_lac + (2*d_t)
     Diam_sac1 = Diam_sac + (2*d_t)
     Diam_c1 = Diam_c + (2*d_t)
     
+    ## Here the perfusion is calculated on the basis of the formulae given in the report and storing the values...
     vol_a = np.pi * 0.25 * (Diam_a1 * Diam_a1) * l_a * n_a
     vol_la = np.pi * 0.25 * (Diam_la1 * Diam_la1) * l_la * n_la
     vol_sa = np.pi * 0.25 * (Diam_sa1 * Diam_sa1) * l_sa * n_sa
@@ -261,6 +271,7 @@ while(Pres<=200):
     perfusion.append(perfuse/6000)
     
     
+    # Calculating the normalised perfusion
     if(Pres==47):
         perfuse_100 = perfuse/6000
         vol_100 = vol_tot
@@ -269,7 +280,8 @@ while(Pres<=200):
     Pres+=1
     
     
-#need comments here
+
+#Normalising the perfusion values...
 perfusion_norm = [(k/perfuse_100) for k in perfusion]
 Test_Pressure = []
 Test_Pressure1=[]
