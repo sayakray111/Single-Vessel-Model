@@ -5,9 +5,13 @@ import math
 import csv
 import scipy.io
 import os.path
-from pathlib import Path
+#from pathlib import Path
 
-mat = scipy.io.loadmat('DAnometa2vals.mat')
+def compartment_resistance(viscosity,length,diameter,number_in_generation):
+	resistance  = (128. * viscosity* length) / (np.pi * math.pow(diameter, 4.) * number_in_generation)
+	return resistance
+
+mat = scipy.io.loadmat('./DAnometa2vals.mat')
 Pvc = float(mat.get('Pvc') / 1333)
 Pac = float(mat.get('Pac') / 1333)
 #calculate the value of Q to be used for the evaluation of shear stress
@@ -99,33 +103,39 @@ def Activation(T):
     Stim = (Cmyo*T)-Ctoned
     return 1/(1+np.exp(-Stim))
 #Viscosity values....
-vis_a = 0.022646*0.1
-vis_la = 0.021087*0.1
-vis_sa = 0.035542*0.1
-vis_c = 0.090517*0.1
-vis_sv = 0.025588*0.1
-vis_lv = 0.023356*0.1
-vis_v = 0.025007*0.1
+vis_a = 0.022646*0.1 #viscosity of artery (Pa.s), directly from Arciero et al
+vis_la = 0.021087*0.1#viscosity of large arteriole (Pa.s), directly from Arciero et al
+vis_sa = 0.035542*0.1 #viscosity of small arteriole(Pa.s), directly from Arciero et al
+vis_c = 0.090517*0.1 #viscosity of capillary (Pa.s), directly from Arciero et al
+vis_sv = 0.025588*0.1 #viscosity of small venule (Pa.s), directly from Arciero et al
+vis_lv = 0.023356*0.1  #viscosity of large venule (Pa.s), directly from Arciero et al
+vis_v = 0.025007*0.1 #viscosity of vein (Pa.s), directly from Arciero et al
+
 # Control Diameters of the segments....
 Diam_la = 0.001
 Diam_sa = 0.001
 Diam_c = 6*1e-6
 Diam_lv = 119.1*1e-6
 Diam_sv = 23.5*1e-6
-Diam_lac = 65.2*1e-6
-Diam_sac = 14.8*1e-6
-d_t = 18.8 * 1e-6
+Diam_lac = 65.2*1e-6 #What is lac?
+Diam_sac = 14.8*1e-6 #what is sac?
+
+#add a comment explaining why this is done
 Resistance_a = 1.88*1e13
 G = (Resistance_a*np.pi*n_a)/(128*vis_a*l_a)
 Diam_a = math.pow((1/G),0.25)
 Resistance_v = 0.19*1e13
 G = (Resistance_v*np.pi*n_v)/(128*vis_v*l_v)
 Diam_v = math.pow((1/G),0.25)
+
+#What is happening here?
+d_t = 18.8 * 1e-6
 Diam_la1 = Diam_la + (2 * d_t)
 Diam_a1 = Diam_a + (2 * d_t)
 Diam_sa1 = Diam_sa + (2 * d_t)
 Diam_lac1 = Diam_lac + (2 * d_t)
 Diam_sac1 = Diam_sac + (2 * d_t)
+
 perfuse = 1
 perfusion = []
 perfuse_100 = 0
@@ -141,7 +151,8 @@ Pressure_in = []
 while(Pres<=200):
     #large arteriole...
     gradP_tot = (Pres-14) * 133.33
-    Resistance_la  = (128 * vis_la* l_la) / (np.pi * math.pow(Diam_la, 4) * n_la)
+    #Calculate resistances via a function, not one by one
+    Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la) 
     Resistance_sa  = (128 * vis_sa * l_sa) / (np.pi * math.pow(Diam_sa, 4) * n_sa)
     Resistance_c   = (128 * vis_c * l_c) / (np.pi * math.pow(Diam_c, 4) * n_c)
     Resistance_lv  = (128 * vis_lv * l_lv) / (np.pi * math.pow(Diam_lv, 4) * n_lv)
@@ -156,12 +167,14 @@ while(Pres<=200):
     #Resistance_totalc = Resistance_totalc + Resistance_a + Resistance_v
     Q_tot = gradP_tot/Resistance_total
     #Rat = ((Pres-Pvc)/(Pac-Pvc))
-    #
+    #Explain what is happening in the next two lines
     P1 = (Pres*133.333)-(Q_tot*Resistance_a)
     P2 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)
     #P2 = P2 + (Q_tot*Resistance_v)
     P_la = (P1+P2)*0.5
     D111 = P_la
+    
+    #define these parameters outside the loop and name them for their artery, make them inputs to your tension function
     Cpass = 1.043
     Cpassd = 8.293
     Cact = 1.596
@@ -175,16 +188,21 @@ while(Pres<=200):
     D0 = 156.49 * 1e-6
     N1 = n_la
     vis_1 = vis_la
-    #X0 = Dekkers(Tension2,0,0.00005,D111)
+    
     Diam_la = fsolve(Tension2,Diam_la,args=D111)
+    
+    #what is this diameter?
     Diam_la1 = Diam_la+(2*d_t)
+    #what is this loop doing and why?
     k = Tension2(Diam_la,D111)
-    #print(k)
     if(abs(k)>0.00008):
         Diam_la = Diam_la+0.000001
         print(Pres)
         continue
+        
     #small arteriole...
+    #define these parameters outside the loop and name them for their artery, make them inputs to your tension function
+
     Cpass = 0.2599
     Cpassd = 11.467
     Cact = 0.274193
@@ -196,32 +214,41 @@ while(Pres<=200):
     D0 = 38.99*1e-6
     N1 = n_sa
     D111 = 0
+    
+    #delete all unused parameters like this one
     h = np.exp(Ctoned)
+    #explain what you are doing here
     P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa)
     P11 = (Pres*133.333)-(Q_tot*Resistance_la)-(Q_tot*Resistance_a)
     P_sa = (P11+P22)*0.5
+    
     D111 = P_sa
     vis_1 = vis_sa
-    #X0 = Dekkers(Tension2,0,0.00005,D111)
+    #X0 = Dekkers(Tension2,0,0.00005,D111) #delete lines you dont use
     Diam_sa = fsolve(Tension2,Diam_sa,args=D111)
+    #hy is the line below there?
     Diam_sa1 = Diam_sa+(2*d_t)
+    #what is this loop supposed to do?
     k = Tension2(Diam_sa,D111)
     if(abs(k)>0.00008):
         Diam_sa = Diam_sa+0.000001
         print(Pres)
         continue
+        
     Pressure_in.append(Pres)
     Pressure_la.append(P_la/133.33)
     Diameter_la.append(Diam_la * 1e06)
     Pressure_sa.append(P_sa/133.33)
     Diameter_sa.append(Diam_sa*1e06)
+    
+    #a lot of the below looks to me to be repeated, do all this together, why redefine d_t every loop?
     d_t = 18.8*1e-6
-    
+    #Explain why you are adding 2*dt to all your diameters, this is not in your write up
     Diam_a1 = Diam_a+(2*d_t)
-    
     Diam_lac1 = Diam_lac + (2*d_t)
     Diam_sac1 = Diam_sac + (2*d_t)
     Diam_c1 = Diam_c + (2*d_t)
+    
     vol_a = np.pi * 0.25 * (Diam_a1 * Diam_a1) * l_a * n_a
     vol_la = np.pi * 0.25 * (Diam_la1 * Diam_la1) * l_la * n_la
     vol_sa = np.pi * 0.25 * (Diam_sa1 * Diam_sa1) * l_sa * n_sa
@@ -232,14 +259,17 @@ while(Pres<=200):
     vol_tot = vol_la + vol_sa + vol_c + vol_lv + vol_sv + vol_a + vol_v
     perfuse = Q_tot / (vol_tot)
     perfusion.append(perfuse/6000)
+    
+    
     if(Pres==47):
         perfuse_100 = perfuse/6000
         vol_100 = vol_tot
         Resistance_total100 = Resistance_total
+        
     Pres+=1
     
     
-
+#need comments here
 perfusion_norm = [(k/perfuse_100) for k in perfusion]
 Test_Pressure = []
 Test_Pressure1=[]
@@ -247,10 +277,10 @@ Test_Diameter = []
 Test_perfusion= []
 gradP_100 = ((70.9/6000)*(Resistance_total100)*vol_100)/133
 print(gradP_100)
-for d in csv.DictReader(open('perfusion(passive).csv')):
+for d in csv.DictReader(open('./perfusion(passive).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
-for d1 in csv.DictReader(open('.Carlson(2008)_dataP.csv')):
+for d1 in csv.DictReader(open('./Carlson(2008)_dataP.csv')):
     Test_Pressure1.append(float(d1['Pressure']))
     Test_Diameter.append(float(d1['Diameter']))
 
