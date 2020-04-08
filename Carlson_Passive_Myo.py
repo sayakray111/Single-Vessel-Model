@@ -6,8 +6,10 @@ import csv
 import scipy.io
 import os.path
 from pathlib import Path
-
-mat = scipy.io.loadmat('C:/Users/ASUS/Desktop/Photos/My_Work/DAnometa2vals.mat')
+def compartment_resistance(viscosity,length,diameter,number_in_generation):
+    resistance  = (128. * viscosity* length) / (np.pi * math.pow(diameter, 4.) * number_in_generation)
+    return resistance
+mat = scipy.io.loadmat('.DAnometa2vals.mat')
 Pvc = float(mat.get('Pvc') / 1333)
 Pac = float(mat.get('Pac') / 1333)
 #calculate the value of Q to be used for the evaluation of shear stress
@@ -141,15 +143,15 @@ Pressure_in = []
 while(Pres<=200):
     #large arteriole...
     gradP_tot = (Pres-14) * 133.33
-    Resistance_la  = (128 * vis_la* l_la) / (np.pi * math.pow(Diam_la, 4) * n_la)
-    Resistance_sa  = (128 * vis_sa * l_sa) / (np.pi * math.pow(Diam_sa, 4) * n_sa)
-    Resistance_c   = (128 * vis_c * l_c) / (np.pi * math.pow(Diam_c, 4) * n_c)
-    Resistance_lv  = (128 * vis_lv * l_lv) / (np.pi * math.pow(Diam_lv, 4) * n_lv)
-    Resistance_sv  = (128 * vis_sv * l_sv) / (np.pi * math.pow(Diam_sv, 4) * n_sv)
-    Resistance_lac = (128 * vis_la * l_la) / (np.pi * math.pow(Diam_lac, 4) * n_la)
-    Resistance_sac = (128 * vis_sa * l_sa) / (np.pi * math.pow(Diam_sac, 4) * n_sa)
-    Resistance_a = (128 * vis_a * l_a) / (np.pi * math.pow(Diam_a, 4) * n_a)
-    Resistance_v = (128 * vis_v * l_v) / (np.pi * math.pow(Diam_v, 4) * n_v)
+    Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la) 
+    Resistance_sa  = compartment_resistance(vis_sa,l_sa,Diam_sa,n_sa) 
+    Resistance_c   = compartment_resistance(vis_c,l_c,Diam_c,n_c) 
+    Resistance_lv  = compartment_resistance(vis_lv,l_lv,Diam_lv,n_lv) 
+    Resistance_sv  = compartment_resistance(vis_sv,l_sv,Diam_sv,n_sv) 
+    Resistance_lac = compartment_resistance(vis_la,l_la,Diam_lac,n_la) 
+    Resistance_sac = compartment_resistance(vis_sa,l_sa,Diam_sac,n_sa) 
+    Resistance_a = compartment_resistance(vis_a,l_a,Diam_a,n_a) 
+    Resistance_v = compartment_resistance(vis_v,l_v,Diam_v,n_v) 
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v
@@ -246,7 +248,7 @@ Test_Diameter = []
 Test_perfusion= []
 gradP_100 = ((70.9/6000)*(Resistance_total100)*vol_100)/133
 print(gradP_100)
-for d in csv.DictReader(open('C:/Users/ASUS/Desktop/Photos/My_Work/perfusion(myo).csv')):
+for d in csv.DictReader(open('.perfusion(myo).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 
