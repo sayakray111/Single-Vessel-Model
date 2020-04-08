@@ -72,7 +72,9 @@ vis = 7*1e-4
 sign = lambda x: math.copysign(1, x)
 N1 = 0
 
-def Tension2(D,P):
+def Tension2(D,*params):
+    
+    P,Cpass,Cpassd,Cact,Cactd,Cactdd,Cmyo,Cshear,Cmeta,Ctoned,N1,D0,vis_1,meta = params
     lam_D = D/D0
     Q = Q_tot/N1
     Q = 0
@@ -140,6 +142,37 @@ D111 = 0.0
 perfuse = 0.0
 Pres = 20
 Pressure_in = []
+# Coeffiecients for large arteriole...
+Cpass_la = 1.043
+Cpassd_la = 8.293
+Cact_la = 1.596
+Cactd_la = 0.6804
+Cactdd_la = 0.2905
+Cmyo_la = 10.1
+Cshear_la = 0.258
+Cmeta_la = 3*1e6
+Ctoned_la = -2.22
+Ctonedd_la = 10.11
+D0_la = 156.49 * 1e-6
+# Coefficients for the small arteriole...
+Cpass_sa = 0.2599
+Cpassd_sa = 11.467
+Cact_sa = 0.274193
+Cactd_sa = 0.750
+Cactdd_sa = 0.383544
+Cmyo_sa = 35.867153
+Cshear_sa = 0.258
+Cmeta_sa = 3*1e06
+Ctoned_sa = -0.53
+Ctonedd_sa = 10.66
+D0_sa = 38.99*1e-6
+# meta calculated in the control state....
+Tlac = 100*133.33*Diam_lac*0.5
+meta_la = ((Cmyo_la*Tlac)-(Cshear_la*5.5)+Ctonedd_la)/Cmeta_la
+print(meta_la)
+Tsac = 100*133.33*Diam_sac*0.5
+meta_sa = ((Cmyo_sa*Tsac)-(Cshear_sa*5.5)+Ctonedd_sa)/Cmeta_sa
+print(meta_sa)
 while(Pres<=200):
     #large arteriole...
     gradP_tot = (Pres-14) * 133.33
@@ -164,50 +197,28 @@ while(Pres<=200):
     #P2 = P2 + (Q_tot*Resistance_v)
     P_la = (P1+P2)*0.5
     D111 = P_la
-    Cpass = 1.043
-    Cpassd = 8.293
-    Cact = 1.596
-    Cactd = 0.6804
-    Cactdd = 0.2905
-    Cmyo = 10.1
-    Cshear = 0.258
-    Cmeta = 30
-    Ctoned = -2.22
-    Ctonedd = 10.11
-    D0 = 156.49 * 1e-6
-    N1 = n_la
-    vis_1 = vis_la
+    
     #X0 = Dekkers(Tension2,0,0.00005,D111)
-    Diam_la = fsolve(Tension2,Diam_la,args=D111)
+    params = (D111,Cpass_la,Cpassd_la,Cact_la,Cactd_la,Cactdd_la,Cmyo_la,Cshear_la,Cmeta_la,Ctoned_la,n_la,D0_la,vis_la,meta_la)
+    Diam_la = fsolve(Tension2,Diam_la,args=params)
     Diam_la1 = Diam_la+(2*d_t)
-    k = Tension2(Diam_la,D111)
+    k = Tension2(Diam_la,*params)
     #print(k)
     if(abs(k)>0.00008):
         Diam_la = Diam_la+0.000001
         print(Pres)
         continue
     #small arteriole...
-    Cpass = 0.2599
-    Cpassd = 11.467
-    Cact = 0.274193
-    Cactd = 0.750
-    Cactdd = 0.383544
-    Cmyo = 35.867153
-    Cshear = 0.258
-    Ctoned = -0.53
-    D0 = 38.99*1e-6
-    N1 = n_sa
-    D111 = 0
     h = np.exp(Ctoned)
     P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa)
     P11 = (Pres*133.333)-(Q_tot*Resistance_la)-(Q_tot*Resistance_a)
     P_sa = (P11+P22)*0.5
     D111 = P_sa
-    vis_1 = vis_sa
     #X0 = Dekkers(Tension2,0,0.00005,D111)
-    Diam_sa = fsolve(Tension2,Diam_sa,args=D111)
-    Diam_sa1 = Diam_sa+(2*d_t)
-    k = Tension2(Diam_sa,D111)
+    params = (D111,Cpass_sa,Cpassd_sa,Cact_sa,Cactd_sa,Cactdd_sa,Cmyo_sa,Cshear_sa,Cmeta_sa,Ctoned_sa,n_sa,D0_sa,vis_sa,meta_sa)
+    Diam_sa = fsolve(Tension2,Diam_sa,args=params)
+    #Diam_sa1 = Diam_sa+(2*d_t)
+    k = Tension2(Diam_sa,*params)
     if(abs(k)>0.00008):
         Diam_sa = Diam_sa+0.000001
         print(Pres)
@@ -257,7 +268,7 @@ print('Diameter = ', Test_Diameter)
 plt.xlim(0,200)
 plt.ylim(0,3)
 plt.xlabel('Pressure(mmHg)')
-plt.ylabel('Diameter(micrometer)')
+plt.ylabel('perfusion(normalised)')
 plt.plot(Test_Pressure,Test_perfusion,'b')
 plt.plot(Pressure_in,perfusion_norm,'r')
 plt.show()
