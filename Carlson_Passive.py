@@ -74,7 +74,8 @@ vis = 7*1e-4
 sign = lambda x: math.copysign(1, x)
 N1 = 0
 
-def Tension2(D,P):
+def Tension2(D,*params):
+    P,Cpass,Cpassd,Cact,Cactd,Cactdd,Cmyo,Cshear,Cmeta,Ctoned,N1,D0,vis_1,meta = params
     lam_D = D/D0
     Q = Q_tot/N1
     Q = 0
@@ -121,6 +122,7 @@ Diam_lac = 65.2*1e-6 #What is lac?
 Diam_sac = 14.8*1e-6 #what is sac?
 
 #add a comment explaining why this is done
+# This is done to calculate the diameter of the artery and the vein from their resistances...
 Resistance_a = 1.88*1e13
 G = (Resistance_a*np.pi*n_a)/(128*vis_a*l_a)
 Diam_a = math.pow((1/G),0.25)
@@ -129,10 +131,9 @@ G = (Resistance_v*np.pi*n_v)/(128*vis_v*l_v)
 Diam_v = math.pow((1/G),0.25)
 
 #What is happening here?
+# Here the diameters of the thicknesses of the tissue layers around the arteries these values are never used except in the perfusion calculations.
 d_t = 18.8 * 1e-6
-Diam_la1 = Diam_la + (2 * d_t)
 Diam_a1 = Diam_a + (2 * d_t)
-Diam_sa1 = Diam_sa + (2 * d_t)
 Diam_lac1 = Diam_lac + (2 * d_t)
 Diam_sac1 = Diam_sac + (2 * d_t)
 
@@ -148,19 +149,50 @@ D111 = 0.0
 perfuse = 0.0
 Pres = 20
 Pressure_in = []
+# Coeffiecients for large arteriole...
+Cpass_la = 1.043
+Cpassd_la = 8.293
+Cact_la = 1.596
+Cactd_la = 0.6804
+Cactdd_la = 0.2905
+Cmyo_la = 10.1
+Cshear_la = 0.258
+Cmeta_la = 3*1e6
+Ctoned_la = -2.22
+Ctonedd_la = 10.11
+D0_la = 156.49 * 1e-6
+# Coefficients for the small arteriole...
+Cpass_sa = 0.2599
+Cpassd_sa = 11.467
+Cact_sa = 0.274193
+Cactd_sa = 0.750
+Cactdd_sa = 0.383544
+Cmyo_sa = 35.867153
+Cshear_sa = 0.258
+Cmeta_sa = 3*1e06
+Ctoned_sa = -0.53
+Ctonedd_sa = 10.66
+D0_sa = 38.99*1e-6
+# meta calculated in the control state....
+Tlac = 100*133.33*Diam_lac*0.5
+meta_la = ((Cmyo_la*Tlac)-(Cshear_la*5.5)+Ctonedd_la)/Cmeta_la
+print(meta_la)
+Tsac = 100*133.33*Diam_sac*0.5
+meta_sa = ((Cmyo_sa*Tsac)-(Cshear_sa*5.5)+Ctonedd_sa)/Cmeta_sa
+print(meta_sa)
 while(Pres<=200):
     #large arteriole...
     gradP_tot = (Pres-14) * 133.33
     #Calculate resistances via a function, not one by one
     Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la) 
-    Resistance_sa  = (128 * vis_sa * l_sa) / (np.pi * math.pow(Diam_sa, 4) * n_sa)
-    Resistance_c   = (128 * vis_c * l_c) / (np.pi * math.pow(Diam_c, 4) * n_c)
-    Resistance_lv  = (128 * vis_lv * l_lv) / (np.pi * math.pow(Diam_lv, 4) * n_lv)
-    Resistance_sv  = (128 * vis_sv * l_sv) / (np.pi * math.pow(Diam_sv, 4) * n_sv)
-    Resistance_lac = (128 * vis_la * l_la) / (np.pi * math.pow(Diam_lac, 4) * n_la)
-    Resistance_sac = (128 * vis_sa * l_sa) / (np.pi * math.pow(Diam_sac, 4) * n_sa)
-    Resistance_a = (128 * vis_a * l_a) / (np.pi * math.pow(Diam_a, 4) * n_a)
-    Resistance_v = (128 * vis_v * l_v) / (np.pi * math.pow(Diam_v, 4) * n_v)
+    Resistance_sa  = compartment_resistance(vis_sa,l_sa,Diam_sa,n_sa) 
+    Resistance_c   = compartment_resistance(vis_c,l_c,Diam_c,n_c) 
+    Resistance_lv  = compartment_resistance(vis_lv,l_lv,Diam_lv,n_lv) 
+    Resistance_sv  = compartment_resistance(vis_sv,l_sv,Diam_sv,n_sv) 
+    Resistance_lac = compartment_resistance(vis_la,l_la,Diam_lac,n_la) 
+    Resistance_sac = compartment_resistance(vis_sa,l_sa,Diam_sac,n_sa) 
+    Resistance_a = compartment_resistance(vis_a,l_a,Diam_a,n_a) 
+    Resistance_v = compartment_resistance(vis_v,l_v,Diam_v,n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v
@@ -176,25 +208,11 @@ while(Pres<=200):
     D111 = P_la
     
     #define these parameters outside the loop and name them for their artery, make them inputs to your tension function
+
     ## All the following parameters are for the large arteriole....
-    Cpass = 1.043
-    Cpassd = 8.293
-    Cact = 1.596
-    Cactd = 0.6804
-    Cactdd = 0.2905
-    Cmyo = 10.1
-    Cshear = 0.258
-    Cmeta = 30
-    Ctoned = -2.22
-    Ctonedd = 10.11
-    D0 = 156.49 * 1e-6
-    N1 = n_la
-    vis_1 = vis_la
-    Diam_la = fsolve(Tension2,Diam_la,args=D111)
-    
-    #what is this diameter?
-    Diam_la1 = Diam_la+(2*d_t)
-    k = Tension2(Diam_la,D111)
+    params = (D111,Cpass_la,Cpassd_la,Cact_la,Cactd_la,Cactdd_la,Cmyo_la,Cshear_la,Cmeta_la,Ctoned_la,n_la,D0_la,vis_la,meta_la)
+    Diam_la = fsolve(Tension2,Diam_la,args=params)
+    k = Tension2(Diam_la,*params)
     # Check if solution has converged if not repeat the problem with that value...
     if(abs(k)>0.00008):
         Diam_la = Diam_la+0.000001
@@ -205,35 +223,20 @@ while(Pres<=200):
     ## These are calculations with respect to the small arteriole.... 
     ## The parameters used here to calculate the small arteriole diameter corresponding to a particular small arteriole midpoint pressure
     #parameters for the small arteriole...
-    Cpass = 0.2599
-    Cpassd = 11.467
-    Cact = 0.274193
-    Cactd = 0.750
-    Cactdd = 0.383544
-    Cmyo = 35.867153
-    Cshear = 0.258
-    Ctoned = -0.53
-    D0 = 38.99*1e-6
-    N1 = n_sa
-    D111 = 0
-    
-    #delete all unused parameters like this one
-    h = np.exp(Ctoned)
-    #explain what you are doing here
+    # Here the midpoint pressure is being calculated....
     P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa)
     P11 = (Pres*133.333)-(Q_tot*Resistance_la)-(Q_tot*Resistance_a)
     P_sa = (P11+P22)*0.5
     
     D111 = P_sa
     ## The mid point pressure for the small arteriole.... (P_sa)
-    vis_1 = vis_sa
-    #X0 = Dekkers(Tension2,0,0.00005,D111) #delete lines you dont use
+    # These parameters are for the small arteriole...
+    params = (D111,Cpass_sa,Cpassd_sa,Cact_sa,Cactd_sa,Cactdd_sa,Cmyo_sa,Cshear_sa,Cmeta_sa,Ctoned_sa,n_sa,D0_sa,vis_sa,meta_sa)
     ## Solve for the small arteriole diameter....
-    Diam_sa = fsolve(Tension2,Diam_sa,args=D111)
-    #hy is the line below there?
-    Diam_sa1 = Diam_sa+(2*d_t)
+    Diam_sa = fsolve(Tension2,Diam_sa,args=params)
+    
     #what is this loop supposed to do?
-    k = Tension2(Diam_sa,D111)
+    k = Tension2(Diam_sa,*params)
     # Check if solution has converged if not repeat the problem with that value...
     if(abs(k)>0.00008):
         Diam_sa = Diam_sa+0.000001
@@ -252,8 +255,7 @@ while(Pres<=200):
     #why redefine d_t every loop? move calculation of all updated diameters here
     #I do not recall you discussing this at all in your description of this model
 
-    # Here the diameters have been converted to their total values which considers the amount of tissue covering the vessels
-    d_t = 18.8*1e-6
+    # Here the diameters have been converted to their total values which considers the amount of tissue covering the vessel..
     Diam_a1 = Diam_a+(2*d_t)
     Diam_lac1 = Diam_lac + (2*d_t)
     Diam_sac1 = Diam_sac + (2*d_t)
