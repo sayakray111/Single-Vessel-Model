@@ -80,7 +80,7 @@ def Tension2(D,*params):
     Q = Q_tot/N1
     Q = 0
     shear = (32 * Q * vis_1)/((np.pi) * math.pow(D, 3))
-    shear = 5.5
+    shear = 5.5 # 55 dyne/cm^2 converted to 5.5 N/m^2
     Stone = (Cmyo*(P*D*0.5))+Ctoned-(Cshear*shear)
     
     Act = 1/(1+np.exp(-Stone))
@@ -104,26 +104,26 @@ def Activation(T):
     Stim = (Cmyo*T)-Ctoned
     return 1/(1+np.exp(-Stim))
 #Viscosity values....
-vis_a = 0.022646*0.1 #viscosity of artery (Pa.s), directly from Arciero et al
-vis_la = 0.021087*0.1#viscosity of large arteriole (Pa.s), directly from Arciero et al
-vis_sa = 0.035542*0.1 #viscosity of small arteriole(Pa.s), directly from Arciero et al
-vis_c = 0.090517*0.1 #viscosity of capillary (Pa.s), directly from Arciero et al
-vis_sv = 0.025588*0.1 #viscosity of small venule (Pa.s), directly from Arciero et al
-vis_lv = 0.023356*0.1  #viscosity of large venule (Pa.s), directly from Arciero et al
-vis_v = 0.025007*0.1 #viscosity of vein (Pa.s), directly from Arciero et al
+vis_a = 2.22646*0.001 #viscosity of artery (Pa.s), directly from Arciero et al
+vis_la = 2.1087*0.001#viscosity of large arteriole (Pa.s), directly from Arciero et al
+vis_sa = 3.5542*0.001 #viscosity of small arteriole(Pa.s), directly from Arciero et al
+vis_c = 9.0517*0.001 #viscosity of capillary (Pa.s), directly from Arciero et al
+vis_sv = 2.5588*0.001 #viscosity of small venule (Pa.s), directly from Arciero et al
+vis_lv = 2.3356*0.001  #viscosity of large venule (Pa.s), directly from Arciero et al
+vis_v = 2.5007*0.001 #viscosity of vein (Pa.s), directly from Arciero et al
 
 # Control Diameters of the segments....
 Diam_la = 0.001
 Diam_sa = 0.001
-Diam_c = 6*1e-6
-Diam_lv = 119.1*1e-6
-Diam_sv = 23.5*1e-6
-Diam_lac = 65.2*1e-6 #What is lac?
-Diam_sac = 14.8*1e-6 #what is sac?
+Diam_c = 6*1e-6 # 6 micrometer converted to meters
+Diam_lv = 119.1*1e-6 # 119.1 micrometers conveted to meters
+Diam_sv = 23.5*1e-6 # 23.5 micrometers converted to meters
+Diam_lac = 65.2*1e-6 #What is lac? 65.2 micrometers converted to meters
+Diam_sac = 14.8*1e-6 #what is sac? 14.8 micrometers converted to meters
 
 #add a comment explaining why this is done
 # This is done to calculate the diameter of the artery and the vein from their resistances...
-Resistance_a = 1.88*1e13
+Resistance_a = 1.88*1e13 # Converted to SI units ... 
 G = (Resistance_a*np.pi*n_a)/(128*vis_a*l_a)
 Diam_a = math.pow((1/G),0.25)
 Resistance_v = 0.19*1e13
@@ -132,7 +132,7 @@ Diam_v = math.pow((1/G),0.25)
 
 #What is happening here?
 # Here the diameters of the thicknesses of the tissue layers around the arteries these values are never used except in the perfusion calculations.
-d_t = 18.8 * 1e-6
+d_t = 18.8 * 1e-6 # Converted to meters from micrometers
 Diam_a1 = Diam_a + (2 * d_t)
 Diam_lac1 = Diam_lac + (2 * d_t)
 Diam_sac1 = Diam_sac + (2 * d_t)
@@ -149,18 +149,18 @@ D111 = 0.0
 perfuse = 0.0
 Pres = 20
 Pressure_in = []
-# Coeffiecients for large arteriole...
-Cpass_la = 1.043
-Cpassd_la = 8.293
-Cact_la = 1.596
-Cactd_la = 0.6804
-Cactdd_la = 0.2905
-Cmyo_la = 10.1
-Cshear_la = 0.258
-Cmeta_la = 3*1e6
-Ctoned_la = -2.22
-Ctonedd_la = 10.11
-D0_la = 156.49 * 1e-6
+# Coefficients for large arteriole...
+Cpass_la = 1042.99*0.001 # Converted from dyne/cm to N/m
+Cpassd_la = 8.293 # unitless so remain same
+Cact_la = 1596.3*0.001 # Converted from dyne/cm to N/m
+Cactd_la = 0.6804 # Unitless
+Cactdd_la = 0.2905 # Unitless
+Cmyo_la = 0.0101*1000 # Convert cm/dyne to m/N
+Cshear_la = 0.0258*10 # Convert cm^2/dyne to m^2/N
+Cmeta_la = 30*1e05 # Convert micromole/cm to 1mole/m^3/m
+Ctoned_la = -2.22 # unitless so remain same
+Ctonedd_la = 10.11 # unitless so remain same
+D0_la = 156.49 * 1e-6 # convert micrometer to m
 # Coefficients for the small arteriole...
 Cpass_sa = 0.2599
 Cpassd_sa = 11.467
@@ -182,7 +182,7 @@ meta_sa = ((Cmyo_sa*Tsac)-(Cshear_sa*5.5)+Ctonedd_sa)/Cmeta_sa
 print(meta_sa)
 while(Pres<=200):
     #large arteriole...
-    gradP_tot = (Pres-14) * 133.33
+    gradP_tot = (Pres-14) * 133.33 # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     #Calculate resistances via a function, not one by one
     Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la) 
     Resistance_sa  = compartment_resistance(vis_sa,l_sa,Diam_sa,n_sa) 
@@ -224,7 +224,7 @@ while(Pres<=200):
     ## The parameters used here to calculate the small arteriole diameter corresponding to a particular small arteriole midpoint pressure
     #parameters for the small arteriole...
     # Here the midpoint pressure is being calculated....
-    P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa)
+    P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa) # all pressures are in N/m^2
     P11 = (Pres*133.333)-(Q_tot*Resistance_la)-(Q_tot*Resistance_a)
     P_sa = (P11+P22)*0.5
     
@@ -257,6 +257,8 @@ while(Pres<=200):
 
     # Here the diameters have been converted to their total values which considers the amount of tissue covering the vessel..
     Diam_a1 = Diam_a+(2*d_t)
+    Diam_la1 = Diam_la +(2*d_t)
+    Diam_sa1 = Diam_sa+(2*d_t)
     Diam_lac1 = Diam_lac + (2*d_t)
     Diam_sac1 = Diam_sac + (2*d_t)
     Diam_c1 = Diam_c + (2*d_t)
@@ -271,12 +273,12 @@ while(Pres<=200):
     vol_v = np.pi * 0.25 * (Diam_v * Diam_v) * l_v * n_v
     vol_tot = vol_la + vol_sa + vol_c + vol_lv + vol_sv + vol_a + vol_v
     perfuse = Q_tot / (vol_tot)
-    perfusion.append(perfuse/6000)
+    perfusion.append(perfuse) # Here perfusion is in 1/sec. but the value in the paper is in 1/100 * 60 secs so should be divided by 6000
     
     
     # Calculating the normalised perfusion
     if(Pres==47):
-        perfuse_100 = perfuse/6000
+        perfuse_100 = perfuse
         vol_100 = vol_tot
         Resistance_total100 = Resistance_total
         
