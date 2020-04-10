@@ -125,9 +125,7 @@ Diam_a = math.pow((1/G),0.25)
 Resistance_v = 0.19*1e13
 G = (Resistance_v*np.pi*n_v)/(128*vis_v*l_v)
 Diam_v = math.pow((1/G),0.25)
-Diam_la1 = Diam_la + (2 * d_t)
 Diam_a1 = Diam_a + (2 * d_t)
-Diam_sa1 = Diam_sa + (2 * d_t)
 Diam_lac1 = Diam_lac + (2 * d_t)
 Diam_sac1 = Diam_sac + (2 * d_t)
 perfuse = 1
@@ -201,7 +199,7 @@ while(Pres<=200):
     #X0 = Dekkers(Tension2,0,0.00005,D111)
     params = (D111,Cpass_la,Cpassd_la,Cact_la,Cactd_la,Cactdd_la,Cmyo_la,Cshear_la,Cmeta_la,Ctoned_la,n_la,D0_la,vis_la,meta_la)
     Diam_la = fsolve(Tension2,Diam_la,args=params)
-    Diam_la1 = Diam_la+(2*d_t)
+    
     k = Tension2(Diam_la,*params)
     #print(k)
     if(abs(k)>0.00008):
@@ -217,7 +215,6 @@ while(Pres<=200):
     #X0 = Dekkers(Tension2,0,0.00005,D111)
     params = (D111,Cpass_sa,Cpassd_sa,Cact_sa,Cactd_sa,Cactdd_sa,Cmyo_sa,Cshear_sa,Cmeta_sa,Ctoned_sa,n_sa,D0_sa,vis_sa,meta_sa)
     Diam_sa = fsolve(Tension2,Diam_sa,args=params)
-    #Diam_sa1 = Diam_sa+(2*d_t)
     k = Tension2(Diam_sa,*params)
     if(abs(k)>0.00008):
         Diam_sa = Diam_sa+0.000001
@@ -231,7 +228,8 @@ while(Pres<=200):
     d_t = 18.8*1e-6
     
     Diam_a1 = Diam_a+(2*d_t)
-    
+    Diam_la1 = Diam_la+(2*d_t)
+    Diam_sa1 = Diam_sa+(2*d_t)
     Diam_lac1 = Diam_lac + (2*d_t)
     Diam_sac1 = Diam_sac + (2*d_t)
     Diam_c1 = Diam_c + (2*d_t)
@@ -259,7 +257,7 @@ Test_Diameter = []
 Test_perfusion= []
 gradP_100 = ((70.9/6000)*(Resistance_total100)*vol_100)/133
 print(gradP_100)
-for d in csv.DictReader(open('.perfusion(myo).csv')):
+for d in csv.DictReader(open('./perfusion(myo).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 
