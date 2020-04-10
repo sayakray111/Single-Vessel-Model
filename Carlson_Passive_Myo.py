@@ -9,7 +9,7 @@ from pathlib import Path
 def compartment_resistance(viscosity,length,diameter,number_in_generation):
     resistance  = (128. * viscosity* length) / (np.pi * math.pow(diameter, 4.) * number_in_generation)
     return resistance
-mat = scipy.io.loadmat('.DAnometa2vals.mat')
+mat = scipy.io.loadmat('./DAnometa2vals.mat')
 Pvc = float(mat.get('Pvc') / 1333)
 Pac = float(mat.get('Pac') / 1333)
 #calculate the value of Q to be used for the evaluation of shear stress
@@ -207,7 +207,6 @@ while(Pres<=200):
         print(Pres)
         continue
     #small arteriole...
-    h = np.exp(Ctoned)
     P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa)
     P11 = (Pres*133.333)-(Q_tot*Resistance_la)-(Q_tot*Resistance_a)
     P_sa = (P11+P22)*0.5
