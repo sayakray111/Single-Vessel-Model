@@ -142,7 +142,7 @@ Cactdd_la = 0.2905 # Unitless
 Cmyo_la = 0.0101*1000 # Convert cm/dyne to m/N
 Cshear_la = 0.0258*10 # Convert cm^2/dyne to m^2/N
 Cmeta_la = 30*1e05 # Convert micromole/cm to 1mole/m^3/m
-Ctoned_la = -2.22 # unitless so remain same
+Ctoned_la = -2.22 # unitless so remain same # Change this constant to -5.22 to generate the pressure diameter curve...
 Ctonedd_la = 10.11 # unitless so remain same
 D0_la = 156.49 * 1e-6 # convert micrometer to m
 # Coefficients for the small arteriole... Unit conversions detailed in the PDF..
