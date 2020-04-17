@@ -50,14 +50,15 @@ def Tension2(D, *params):
     
     Pres,Cpass,Cpassd,Cact,Cactd,Cactdd,Cmyo,Cshear,Cmeta,Ctonedd,D0,Diam_2,flag,N1,vis_1,xD = params
     # Determine which diameter is which....
-    if(flag==1):
+    if(flag==1): # This flag will calculate for the large arteriole diameter... the small arteriole diameter..
         Diam_la = D
         Diam_sa = Diam_2
-    else:
+    else: # This flag will calculate for the small arteriole diameter... the large arteriole diameter..
         Diam_la = Diam_2
         Diam_sa = D
     #Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 14) * 133.33 # Pressure converted from mmHg to N/m^2 by multiplying with 133.33 End vein pressure assumed to be 14mmHg
+    gradP_tot = (Pres - 14) * 133.33 # Pressure converted from mmHg to N/m^2 by multiplying with 133.33 
+    # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la = compartment_resistance(vis_la,l_la,Diam_la,n_la) 
     Resistance_sa = compartment_resistance(vis_sa,l_sa,Diam_sa,n_sa) 
@@ -67,34 +68,34 @@ def Tension2(D, *params):
     Resistance_a =  compartment_resistance(vis_a,l_a,Diam_a,n_a) 
     Resistance_v =  compartment_resistance(vis_v,l_v,Diam_v,n_v) 
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
-    Resistance_total = Resistance_total + Resistance_a
-    Q_tot = gradP_tot / Resistance_total
+    Resistance_total = Resistance_total + Resistance_a # The total resistance is being calculated...
+    Q_tot = gradP_tot / Resistance_total # Calculates the value of total discharge...
     #-----------------------------------------------------
-    Q = Q_tot/N1
-    if(flag==1):
+    Q = Q_tot/N1 # Calculate the discharge for the specific case...
+    if(flag==1): # This is the case if it is the large arteriole....
         shear = (32 * Q * vis_1)/((np.pi) * math.pow(Diam_la, 3))
         P1 = (Pres * 133.333)-(Q_tot*Resistance_a)
         P2 = (Pres * 133.333)- (Q_tot * Resistance_la)-(Q_tot*Resistance_a)
-        Pmid = (P1+P2)*0.5
-    else:
+        Pmid = (P1+P2)*0.5 # The midpoint diameter of the large arteriole... 
+    else: # This is the case when it is the small arteriole...
         shear = (32 * Q * vis_1)/((np.pi) * math.pow(Diam_sa, 3))
         P2 = (Pres * 133.333)- (Q_tot * Resistance_la)-(Q_tot*Resistance_sa)-(Q_tot*Resistance_a)
         P1 = (Pres * 133.333)- (Q_tot * Resistance_la)-(Q_tot*Resistance_a)
-        Pmid = (P1+P2)*0.5
+        Pmid = (P1+P2)*0.5 # The midpoint diameter of the small arteriole...
     # Calculating the consumption of ATP...
     cons = (Diam_la,Diam_sa,Q_tot)
     # Calculating the metabolic constant (SCR) ...
     meta = SCR(xD,*cons)
-    lam_D = D / D0
-    Stone = (Cmyo * (Pmid * D * 0.5)) + Ctonedd - (Cshear * shear) - (Cmeta * meta)
-    Act = 1 / (1 + np.exp(-Stone))
+    lam_D = D / D0 # The ratio of diameters...
+    Stone = (Cmyo * (Pmid * D * 0.5)) + Ctonedd - (Cshear * shear) - (Cmeta * meta) # The stone is the tone of the vessel...
+    Act = 1 / (1 + np.exp(-Stone)) # The activation of the smooth muscles....
     p1 = (lam_D - 1) * Cpassd
     p2 = np.exp(p1)
     Tpass = Cpass * p2
     s1 = (lam_D - Cactd) / (Cactdd)
     s2 = math.pow(s1, 2)
     s3 = np.exp(-s2)
-    Tact = Cact * s3
+    Tact = Cact * s3 # The activation of the active tension...
     Ttot = Tpass + (Act * Tact)
     return (Ttot) - (Pmid * D * 0.5)
 
@@ -114,7 +115,7 @@ def Saturation(x,*params1):
         D = D2
         S_i = Saturation(1.2,*Pw2)
         Q = Q_tot / 143
-        X_i = 1.2 * 1e-2
+        X_i = 1.2 * 1e-2 
     elif (1.56 < x <= 1.61):
         D = 6 * 1e-6
         S_i = Saturation(1.56,*Pw2)
@@ -127,7 +128,7 @@ def Saturation(x,*params1):
     q1 = 0.25 * np.pi * M_0 * (((D + (37.6 * 1e-6)) * (D + (37.6 * 1e-6))) - (D * D))
     x = x * 1e-2
     A1 = S_i - (q1 / (Q * c0 * H_D)) * (x - X_i)
-    return S_i - (q1 / (Q * c0 * H_D)) * (x - X_i)
+    return S_i - (q1 / (Q * c0 * H_D)) * (x - X_i) # The 
 
 # This calculates the consumption of ATP as a function of x(distance along the length of the vessel)
 def Consumption(x,*params2):
@@ -377,31 +378,23 @@ while(k<len(Diameter_la)):
     vol_v = np.pi * 0.25 * (Diam_v * Diam_v) * l_v * n_v
     vol_tot = vol_la + vol_sa + vol_c + vol_lv + vol_sv + vol_a + vol_v
     perfuse = Q_tot / (vol_tot) # Calculate the total perfusion....
-    perfusion.append(perfuse)
+    perfusion.append(perfuse) # The perfusion values are to be collected...
 
     if (Pressure_in[k] == 100):
-        perfuse_100 = perfuse
+        perfuse_100 = perfuse # The value of this perfusion is around 0.0117 it is quite same with 0.0118.
+	# This value is taken from the paper at the control state...
         print('Perfusion=', perfuse_100)
 
     k+=1
 
-
-#perfuse_100 = (70.9)/(6000*6000)
-Diam_lac = 65.2 * 1e-6
-vis_la = 0.00211
-l_la = 0.59 * 1e-2
-n_la = 1
-Resistance_lac = (128 * vis_c * l_c) / (np.pi * math.pow(Diam_c, 4) * n_c)
-print('Value got = ', Resistance_lac / (1e13))
-print('Value in paper = ', (7.5))
-l1 = np.arange(0.1, 3, 0.01).tolist()
+# Calculate the normalised perfusion... 
 perfusion_norm = [(k / perfuse_100) for k in perfusion]
 #Sat = [Saturation(l) for l in l1]
 #Conc = [Consumption(l) * 1000 for l in l1]
 Test_Pressure = []
 Test_Pressure1 = []
 Test_Diameter = []
-Test_perfusion = []
+Test_Diameter1 = []
 #gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 #print(Diameter_sa)
 #print(S3)
