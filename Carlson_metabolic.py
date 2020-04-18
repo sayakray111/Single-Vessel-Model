@@ -1,3 +1,5 @@
+
+# Written by Sayak Ray of the university of Auckland
 import numpy as np
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
