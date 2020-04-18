@@ -16,18 +16,6 @@ Pac = float(mat.get('Pac') / 1333)
 Q_tot = 0
 gradP_tot = 0
 Resistance_total = 0
-Resistance_c = 0
-Q_la = 0
-Q_sa = 0
-Q_c = 0
-Q_sv = 0
-Q_lv = 0
-Q_la = Q_tot
-Q_sa = Q_tot/143
-Q_lv = Q_tot
-Q_sv = Q_tot/143
-Q_c = Q_tot/5515
-
 
 # The length of the various segments.
 l_c = 0.05*0.01
@@ -53,24 +41,15 @@ n_lv = 1
 n_sv = 143
 
 # volume of the segments...
-vol_la = 0
-vol_sa = 0
-vol_c = 0
-vol_sv = 0
-vol_lv = 0
-vol_tot = 0
-shear  = 0
+vol_la = 0.0
+vol_sa = 0.0
+vol_c = 0.0
+vol_sv = 0.0
+vol_lv = 0.0
+vol_tot = 0.0
+shear  = 0.0
 
 #P = 100*133.333
-Diameter = []
-Pressure = []
-f1  = []
-f2  = []
-Tes = []
-vis = 7*1e-4
-
-sign = lambda x: math.copysign(1, x)
-N1 = 0
 
 def Tension2(D,*params):
     
@@ -231,9 +210,10 @@ while(Pres<=200):
     vol_tot = vol_la + vol_sa + vol_c + vol_lv + vol_sv + vol_a + vol_v
     # Calculate the perfusion...
     perfuse = Q_tot / (vol_tot)
-    perfusion.append(perfuse/6000)
+    perfusion.append(perfuse)
     if(Pres==100):
-        perfuse_100 = perfuse/6000
+        perfuse_100 = perfuse
+        print('Perfusion = ',perfuse_100)
         vol_100 = vol_tot
         Resistance_total100 = Resistance_total
     Pres+=1
