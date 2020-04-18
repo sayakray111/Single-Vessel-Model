@@ -1,3 +1,6 @@
+
+# Written by Sayak Ray University of Auckland 
+# The pressure Diameter curve requested is to be changed based on the settings...
 import numpy as np
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
