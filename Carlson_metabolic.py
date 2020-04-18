@@ -394,7 +394,7 @@ perfusion_norm = [(k / perfuse_100) for k in perfusion]
 Test_Pressure = []
 Test_Pressure1 = []
 Test_Diameter = []
-Test_Diameter1 = []
+Test_perfusion = []
 #gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 #print(Diameter_sa)
 #print(S3)
