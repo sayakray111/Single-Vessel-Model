@@ -18,19 +18,6 @@ Pac = float(mat.get('Pac') / 1333)
 Q_tot = 0
 gradP_tot = 0
 Resistance_total = 0
-Resistance_c = 0
-Q_la = 0
-Q_sa = 0
-Q_c = 0
-Q_sv = 0
-Q_lv = 0
-Q_la = Q_tot
-Q_sa = Q_tot/143
-Q_lv = Q_tot
-Q_sv = Q_tot/143
-Q_c = Q_tot/5515
-
-
 # The length of the various segments.
 l_c = 0.05*0.01
 l_v = 0.61*0.01
@@ -39,12 +26,6 @@ l_la = 0.59*0.01
 l_lv = 0.59*0.01
 l_sv = 0.36*0.01
 l_sa = 0.36*0.01
-# the pressure drop in the segments.
-P_la = 0
-P_lv = 0
-P_sa = 0
-P_sv = 0
-P_c = 0
 # Numbers of various vessels.
 n_c =  5515
 n_la = 1
@@ -55,25 +36,14 @@ n_lv = 1
 n_sv = 143
 
 # volume of the segments...
-vol_la = 0
-vol_sa = 0
-vol_c = 0
-vol_sv = 0
-vol_lv = 0
-vol_tot = 0
-shear  = 0
-
-#P = 100*133.333
-Diameter = []
-Pressure = []
-f1  = []
-f2  = []
-Tes = []
-vis = 7*1e-4
-
-sign = lambda x: math.copysign(1, x)
-N1 = 0
-
+vol_la = 0.0
+vol_sa = 0.0
+vol_c = 0.0
+vol_sv = 0.0
+vol_lv = 0.0
+vol_tot = 0.0
+shear  = 0.0
+# Function for calculating the tension in the segment... This is fed to fsolve to solve for the diameter at which net Tension is zero.
 def Tension2(D,*params):
     P,Cpass,Cpassd,Cact,Cactd,Cactdd,Cmyo,Cshear,Cmeta,Ctoned,N1,D0,vis_1,meta = params
     lam_D = D/D0
@@ -98,11 +68,6 @@ def Tension2(D,*params):
     #print(Ttot-(P*D*0.5))
     return (Ttot)-(P*D*0.5)
 
-
-
-def Activation(T):
-    Stim = (Cmyo*T)-Ctoned
-    return 1/(1+np.exp(-Stim))
 #Viscosity values....
 vis_a = 2.22646*0.001 #viscosity of artery (Pa.s), directly from Arciero et al
 vis_la = 2.1087*0.001#viscosity of large arteriole (Pa.s), directly from Arciero et al
@@ -112,14 +77,15 @@ vis_sv = 2.5588*0.001 #viscosity of small venule (Pa.s), directly from Arciero e
 vis_lv = 2.3356*0.001  #viscosity of large venule (Pa.s), directly from Arciero et al
 vis_v = 2.5007*0.001 #viscosity of vein (Pa.s), directly from Arciero et al
 
-# Control Diameters of the segments....
-Diam_la = 0.001
-Diam_sa = 0.001
-Diam_c = 6*1e-6 # 6 micrometer converted to meters
-Diam_lv = 119.1*1e-6 # 119.1 micrometers conveted to meters
-Diam_sv = 23.5*1e-6 # 23.5 micrometers converted to meters
-Diam_lac = 65.2*1e-6 #What is lac? 65.2 micrometers converted to meters
-Diam_sac = 14.8*1e-6 #what is sac? 14.8 micrometers converted to meters
+# Control Diameters of the segments.... Non vasoactive segments retain control diameters 
+# vasoactive segments change their diameter with pressure..
+Diam_la = 0.001 # Initial guess for large arteriole diameter
+Diam_sa = 0.001 # Initial guess for small arteriole diameter
+Diam_c = 6*1e-6 # 6 micrometer converted to meters Diameter of the capillary
+Diam_lv = 119.1*1e-6 # 119.1 micrometers conveted to meters Diameter of the large vein
+Diam_sv = 23.5*1e-6 # 23.5 micrometers converted to meters Diameter of the small vein
+Diam_lac = 65.2*1e-6 #What is lac? 65.2 micrometers converted to meters.. Control diameter of the large arteriole.
+Diam_sac = 14.8*1e-6 #what is sac? 14.8 micrometers converted to meters.. Control diameter of the small arteriole.
 
 #add a comment explaining why this is done
 # This is done to calculate the diameter of the artery and the vein from their resistances...
@@ -136,18 +102,17 @@ d_t = 18.8 * 1e-6 # Converted to meters from micrometers
 Diam_a1 = Diam_a + (2 * d_t)
 Diam_lac1 = Diam_lac + (2 * d_t)
 Diam_sac1 = Diam_sac + (2 * d_t)
-
-perfuse = 1
+Diam_c1 = Diam_c + (2*d_t)
+# Initialise some terms...
 perfusion = []
 perfuse_100 = 0
 Pressure_sa = []
 Diameter_sa = []
 Diameter_la = []
 Pressure_la = []
-Pres = 14
+Pres = 20
 D111 = 0.0
 perfuse = 0.0
-Pres = 20
 Pressure_in = []
 # Coefficients for large arteriole...
 Cpass_la = 1042.99*0.001 # Converted from dyne/cm to N/m
@@ -256,13 +221,8 @@ while(Pres<=200):
     #I do not recall you discussing this at all in your description of this model
 
     # Here the diameters have been converted to their total values which considers the amount of tissue covering the vessel..
-    Diam_a1 = Diam_a+(2*d_t)
     Diam_la1 = Diam_la +(2*d_t)
     Diam_sa1 = Diam_sa+(2*d_t)
-    Diam_lac1 = Diam_lac + (2*d_t)
-    Diam_sac1 = Diam_sac + (2*d_t)
-    Diam_c1 = Diam_c + (2*d_t)
-    
     ## Here the perfusion is calculated on the basis of the formulae given in the report and storing the values...
     vol_a = np.pi * 0.25 * (Diam_a1 * Diam_a1) * l_a * n_a
     vol_la = np.pi * 0.25 * (Diam_la1 * Diam_la1) * l_la * n_la
