@@ -128,7 +128,7 @@ def Saturation(x,*params1):
     q1 = 0.25 * np.pi * M_0 * (((D + (37.6 * 1e-6)) * (D + (37.6 * 1e-6))) - (D * D))
     x = x * 1e-2
     A1 = S_i - (q1 / (Q * c0 * H_D)) * (x - X_i)
-    return S_i - (q1 / (Q * c0 * H_D)) * (x - X_i) # The 
+    return S_i - (q1 / (Q * c0 * H_D)) * (x - X_i) # The Saturation is being returned based on the equation given in the report... 
 
 # This calculates the consumption of ATP as a function of x(distance along the length of the vessel)
 def Consumption(x,*params2):
