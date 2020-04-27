@@ -56,12 +56,14 @@ shear  = 0.0
 
 def Tension2(D,*params):
     
-    P,Cpass,Cpassd,Cact,Cactd,Cactdd,Cmyo,Cshear,Cmeta,Ctoned,N1,D0,vis_1,meta = params
+    P,Cpass,Cpassd,Cact,Cactd,Cactdd,Cmyo,Cshear,Cmeta,Ctoned,N1,D0,vis_1,meta,flag2 = params
     lam_D = D/D0
     Q = Q_tot/N1
     Q = 0
-    shear = (32 * Q * vis_1)/((np.pi) * math.pow(D, 3))
-    shear = 5.5 # Comment this line out if you want to see the diameter-pressure curve as is in the figure...
+    if(flag2 ==1):
+       shear = 5.5 
+    else:
+       shear = (32 * Q * vis_1)/((np.pi) * math.pow(D, 3))
     Stone = (Cmyo*(P*D*0.5))+Ctoned-(Cshear*shear)
     
     Act = 1/(1+np.exp(-Stone))
@@ -124,7 +126,8 @@ Cactdd_la = 0.2905 # Unitless
 Cmyo_la = 0.0101*1000 # Convert cm/dyne to m/N
 Cshear_la = 0.0258*10 # Convert cm^2/dyne to m^2/N
 Cmeta_la = 30*1e05 # Convert micromole/cm to 1mole/m^3/m
-Ctoned_la = -2.22 # unitless so remain same # Change this constant to -5.22 to generate the pressure diameter curve...
+Ctoned_la = -2.22 # unitless so remain same # 
+Ctoned_la2 = -5.22 # unitless so remain same # 
 Ctonedd_la = 10.11 # unitless so remain same
 D0_la = 156.49 * 1e-6 # convert micrometer to m
 # Coefficients for the small arteriole... Unit conversions detailed in the PDF..
@@ -146,6 +149,8 @@ print(meta_la)
 Tsac = 100*133.33*Diam_sac*0.5
 meta_sa = ((Cmyo_sa*Tsac)-(Cshear_sa*5.5)+Ctonedd_sa)/Cmeta_sa
 print(meta_sa)
+flag_shear = 1
+Diam_la2 = 0.001
 while(Pres<=200):
     #large arteriole...
     gradP_tot = (Pres-14) * 133.33 # Convert the pressure to pascals from mmHg...
@@ -167,19 +172,23 @@ while(Pres<=200):
     P_la = (P1+P2)*0.5 # Calculate the midpoint pressure...
     D111 = P_la
     # Solve for the diameter of the large arteriole...
-    params = (D111,Cpass_la,Cpassd_la,Cact_la,Cactd_la,Cactdd_la,Cmyo_la,Cshear_la,Cmeta_la,Ctoned_la,n_la,D0_la,vis_la,meta_la)
+    params = (D111,Cpass_la,Cpassd_la,Cact_la,Cactd_la,Cactdd_la,Cmyo_la,Cshear_la,Cmeta_la,Ctoned_la,n_la,D0_la,vis_la,meta_la,flag_shear)
+    params2 = (D111,Cpass_la,Cpassd_la,Cact_la,Cactd_la,Cactdd_la,Cmyo_la,Cshear_la,Cmeta_la,Ctoned_la2,n_la,D0_la,vis_la,meta_la,flag_shear-1)
     Diam_la = fsolve(Tension2,Diam_la,args=params)
+    Diam_la2 = fsolve(Tension2,Diam_la2,args=params2)
     # Check if the solution appropriately converges...
     k = Tension2(Diam_la,*params)
-    if(abs(k)>0.01):
+    k1 = Tension2(Diam_la2,*params2)
+    if(abs(k)>0.01 or abs(k1)>0.01):
         Diam_la = Diam_la+0.000001
+        Diam_la2 = Diam_la2+0.000001
         print(Pres)
         continue
     P22 = (Pres*133.333)-(Q_tot*Resistance_a)-(Q_tot*Resistance_la)-(Q_tot*Resistance_sa)
     P11 = (Pres*133.333)-(Q_tot*Resistance_la)-(Q_tot*Resistance_a)
     P_sa = (P11+P22)*0.5 # Calculate the midpoint pressure...
     D111 = P_sa
-    params = (D111,Cpass_sa,Cpassd_sa,Cact_sa,Cactd_sa,Cactdd_sa,Cmyo_sa,Cshear_sa,Cmeta_sa,Ctoned_sa,n_sa,D0_sa,vis_sa,meta_sa)
+    params = (D111,Cpass_sa,Cpassd_sa,Cact_sa,Cactd_sa,Cactdd_sa,Cmyo_sa,Cshear_sa,Cmeta_sa,Ctoned_sa,n_sa,D0_sa,vis_sa,meta_sa,flag_shear)
     # Solves for the diameter of the small arteriole..
     Diam_sa = fsolve(Tension2,Diam_sa,args=params)
     # Check if the solution appropriately converges...
@@ -191,7 +200,7 @@ while(Pres<=200):
     # Assigning and storing the values of the pressures and diameters....
     Pressure_in.append(Pres)
     Pressure_la.append(P_la/133.33)
-    Diameter_la.append(Diam_la * 1e06)
+    Diameter_la.append(Diam_la2 * 1e06)
     Pressure_sa.append(P_sa/133.33)
     Diameter_sa.append(Diam_sa*1e06)
     # Calculate the total diameters assuming the layer of tissue surrounding the vessels..
