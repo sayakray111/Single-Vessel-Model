@@ -77,11 +77,11 @@ def Tension2(D, *params):
     if (flag == 1):  # This is the case if it is the large arteriole....
         shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_la, 3))
         P1 = (Pres * 133.333) - (Q_tot * Resistance_a)
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
+        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
         Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
     else:  # This is the case when it is the small arteriole...
         shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_sa, 3))
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa) - (Q_tot * Resistance_a)
+        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
         P1 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
         Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the small arteriole...
     # Calculating the consumption of ATP...
@@ -131,11 +131,11 @@ def Activation(D, *params):
     if (flag == 1):  # This is the case if it is the large arteriole....
         shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_la, 3))
         P1 = (Pres * 133.333) - (Q_tot * Resistance_a)
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
+        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
         Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
     else:  # This is the case when it is the small arteriole...
         shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_sa, 3))
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa) - (Q_tot * Resistance_a)
+        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
         P1 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
         Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the small arteriole...
     # Calculating the consumption of ATP...
@@ -163,10 +163,10 @@ def Saturation(x, *params1):
     D1, D2, Q_tot = params1
     Pw2 = (D1, D2, Q_tot)
     if (0 < x <= 0.61):
-        return 0.97
+        return 0.9731
     elif (0.61 < x <= 1.2):
         D = D1
-        S_i = 0.97
+        S_i = 0.9731
         Q = Q_tot
         X_i = 0.61 * 1e-2
     elif (1.2 < x <= 1.56):
@@ -196,7 +196,7 @@ def Consumption(x, *params2):
     Pw = (D1, D2, Q_tot)
     X = x * 1e-2
     if (0 < x <= 0.61):
-        C_i = 0.5 * 1e-3
+        C_i = 0.5051 * 1e-3
         return C_i
     elif (0.61 < x <= 1.2):
         D = D1
@@ -230,7 +230,7 @@ def Consumption(x, *params2):
     else:
         D = 119.1 * 1e-6
         C_i = Consumption(1.97, *Pw)
-        S_i = Saturation(1.97, *Pw)
+        S_i = Saturation(1.61, *Pw)
         Q = Q_tot
         X_i = 1.97 * 1e-2
         gamma1 = (k_d * (np.pi) * D) / (0.6 * Q)
@@ -273,12 +273,12 @@ vis_sv = 0.0256 * 0.1  # viscosity of small venule (Pa.s), directly from Arciero
 vis_lv = 0.0234 * 0.1  # viscosity of large venule (Pa.s), directly from Arciero et al
 vis_v = 0.0250 * 0.1  # viscosity of vein (Pa.s), directly from Arciero et al
 # Diameters of the artery.....This is done to calculate the diameter of the artery and the vein from their resistances...
-Resistance_a = 1.88 * 1e11 * 133
+Resistance_a = 1.88 * 1e11*133.333
 G = (128 * vis_a * l_a) / (np.pi * Resistance_a * n_a)
 Diam_a = math.pow(G, 0.25)
 print('Diameter of the main artery is = ', Diam_a * 1e06)
 # Diameters of the vein....This is done to calculate the diameter of the artery and the vein from their resistances...
-Resistance_v = 0.19 * 1e11 * 133
+Resistance_v = 0.19 * 1e11*133.333
 G = (128 * vis_v * l_v) / (np.pi * Resistance_v * n_v)
 Diam_v = math.pow(G, 0.25)
 print('Diameter of the main vein is = ', Diam_v * 1e06)
@@ -537,3 +537,19 @@ plt.plot(Pressure_in, Acti_myo, 'c')
 plt.plot(Pressure_in, Acti_shear, 'm')
 plt.plot(Pressure_in, Acti_meta, 'y')
 plt.show()
+interpolated = np.interp(Pressure_in, Test_Pressure, Test_Diameter).tolist()
+k = 0
+sum222 = 0.0
+while(k<len(interpolated)):
+    sum222 = sum222+(abs(interpolated[k]-Diameter_la[k])/(interpolated[k]))
+    k+=1
+avg = sum222/(len(interpolated))
+print('the error in Diameter  = ',avg*100)
+interpolated1 = np.interp(Pressure_in, Test_Pressure1, Test_perfusion).tolist()
+k = 0
+sum221 = 0.0
+while(k<len(interpolated1)):
+    sum221 = sum221+(abs(interpolated1[k]-perfusion_norm[k])/(interpolated1[k]))
+    k+=1
+avg = sum221/(len(interpolated1))
+print('the error in Perfusion  = ',avg*100)
