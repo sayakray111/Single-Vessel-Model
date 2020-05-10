@@ -59,7 +59,7 @@ def Tension2(D, *params):
         Diam_la = Diam_2
         Diam_sa = D
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 14) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la = compartment_resistance(vis_la, l_la, Diam_la, n_la)
@@ -113,7 +113,7 @@ def Activation(D, *params):
         Diam_la = Diam_2
         Diam_sa = D
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 14) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la = compartment_resistance(vis_la, l_la, Diam_la, n_la)
@@ -421,7 +421,7 @@ while (Pres <= 200):
 k = 0
 # Loop to calculate the perfusion...
 while (k < len(Diameter_la)):
-    gradP_tot = (Pressure_in[k] - 14) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pressure_in[k] - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     Resistance_la = compartment_resistance(vis_la, l_la, Diameter_la[k] * 1e-6, n_la)
     Resistance_sa = compartment_resistance(vis_sa, l_sa, Diameter_sa[k] * 1e-6, n_sa)
     Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
