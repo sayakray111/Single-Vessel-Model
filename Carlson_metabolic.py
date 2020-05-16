@@ -59,19 +59,24 @@ def Tension2(D, *params):
         Diam_la = Diam_2
         Diam_sa = D
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 11.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la = compartment_resistance(vis_la, l_la, Diam_la, n_la)
     Resistance_sa = compartment_resistance(vis_sa, l_sa, Diam_sa, n_sa)
+    Resistance_lac = compartment_resistance(vis_la, l_la, Diam_lac, n_la)
+    Resistance_sac = compartment_resistance(vis_sa, l_sa, Diam_sac, n_sa)
     Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
     Resistance_lv = compartment_resistance(vis_lv, l_lv, Diam_lv, n_lv)
     Resistance_sv = compartment_resistance(vis_sv, l_sv, Diam_sv, n_sv)
     Resistance_a = compartment_resistance(vis_a, l_a, Diam_a, n_a)
     Resistance_v = compartment_resistance(vis_v, l_v, Diam_v, n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
+    Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v  # The total resistance is being calculated...
+    Resistance_totalc = Resistance_totalc + Resistance_a + Resistance_v
     Q_tot = gradP_tot / Resistance_total  # Calculates the value of total discharge...
+    
     # -----------------------------------------------------
     Q = Q_tot / N1  # Calculate the discharge for the specific case...
     if (flag == 1):  # This is the case if it is the large arteriole....
@@ -113,7 +118,7 @@ def Activation(D, *params):
         Diam_la = Diam_2
         Diam_sa = D
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 11.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la = compartment_resistance(vis_la, l_la, Diam_la, n_la)
@@ -186,8 +191,8 @@ def Saturation(x, *params1):
     q1 = 0.25 * np.pi * M_0 * (((D + (37.6 * 1e-6)) * (D + (37.6 * 1e-6))) - (D * D))
     x = x * 1e-2
     A1 = S_i - (q1 / (Q * c0 * H_D)) * (x - X_i)
-    return S_i - (q1 / (Q * c0 * H_D)) * (
-                x - X_i)  # The Saturation is being returned based on the equation given in the report...
+    if(A1<=0): return 0 # The Saturation is being returned based on the equation given in the report...
+    else: return A1
 
 
 # This calculates the consumption of ATP as a function of x(distance along the length of the vessel)
@@ -222,29 +227,27 @@ def Consumption(x, *params2):
         S_i = Saturation(1.61, *Pw)
         Q = Q_tot / 143
         X_i = 1.61 * 1e-2
-        gamma1 = (k_d * (np.pi) * D) / (0.6 * Q)
-        alpha1 = ((H_T * R_0) / (4 * k_d)) * ((D * (1 - (R_1 * S_i))))
-        A1 = (C_i - alpha1) / (np.exp(-gamma1 * X_i))
-        C = A1 * np.exp(-gamma1 * X) + alpha1
-        return C
+        
     else:
         D = 119.1 * 1e-6
         C_i = Consumption(1.97, *Pw)
         S_i = Saturation(1.61, *Pw)
         Q = Q_tot
         X_i = 1.97 * 1e-2
+        
+    if(Saturation(x, *Pw)<=0):
         gamma1 = (k_d * (np.pi) * D) / (0.6 * Q)
         alpha1 = ((H_T * R_0) / (4 * k_d)) * ((D * (1 - (R_1 * S_i))))
         A1 = (C_i - alpha1) / (np.exp(-gamma1 * X_i))
         C = A1 * np.exp(-gamma1 * X) + alpha1
         return C
-    q1 = 0.25 * np.pi * M_0 * (((D + 37.6 * 1e-6) * (D + 37.6 * 1e-6)) - (D * D))
-    alpha = ((H_T * R_0) / (4 * k_d)) * (
-            (D * (1 - (R_1 * S_i))) - (((1 - H_D) * R_1 * q1) / ((np.pi) * c0 * H_D * k_d)))
-    beta = (D * H_T * R_0 * R_1 * q1) / (4 * Q * c0 * H_D * k_d)
-    gamma = (k_d * (np.pi) * D) / (0.6 * Q)
-    C = alpha + (beta * (X - X_i)) + np.exp(gamma * (X_i - X)) * (C_i - alpha)
-    return C
+    else:
+        q1 = 0.25 * np.pi * M_0 * (((D + (37.6 * 1e-6)) * (D + (37.6 * 1e-6))) - (D * D))
+        alpha = ((H_T * R_0) / (4 * k_d)) * ((D * (1 - (R_1 * S_i))) - (((1 - H_D) * R_1 * q1) / ((np.pi) * c0 * H_D * k_d)))
+        beta = (D * H_T * R_0 * R_1 * q1) / (4 * Q * c0 * H_D * k_d)
+        gamma = (k_d * (np.pi) * D) / (0.6 * Q)
+        C = alpha + (beta * (X - X_i)) + np.exp(gamma * (X_i - X)) * (C_i - alpha)
+        return C
 
 
 # Function inside integral
@@ -285,8 +288,8 @@ print('Diameter of the main vein is = ', Diam_v * 1e06)
 Diam_c = 6 * 1e-6  # Diameter of the capillary adapted from the paper
 Diam_lv = 119.1 * 1e-6  # Diameter of the large venule adapted from the paper
 Diam_sv = 23.5 * 1e-6  # Diameter of the small venule adapted from the paper
-Diam_sa = 0.0001  # Diameter of the small arteriole which is given as initial guess to the fsolve routine...
-Diam_la = 0.001  # Diameter of the large arteriole which is given as initial guess to the fsolve routine...
+Diam_sa = 30*1e-6  # Diameter of the small arteriole which is given as initial guess to the fsolve routine...
+Diam_la = 110*1e-6  # Diameter of the large arteriole which is given as initial guess to the fsolve routine...
 d_t = 18.8 * 1e-6  # layer of tissue around the vessels...
 # Control Diameters of the large arteriole adapted from the paper 
 Diam_lac = 65.2 * 1e-6
@@ -408,7 +411,7 @@ while (Pres <= 200):
             print('Hitting a hole at a diameter (small) = ', Diam_sa, ' Pressure = ', Pres)
             k = Tension2(Diam_sa, *params)
             print('error is small = ', k)
-            if (Diam_sa < 3e-5 and abs(k) < 1e-8):
+            if (Diam_sa < 3e-5 and abs(k) < 1e-6):
                 break
             n += 1
     # Store the pressures and diameters....
@@ -416,12 +419,12 @@ while (Pres <= 200):
     Diameter_la.append(Diam_la * 1e06)
     Diameter_sa.append(Diam_sa * 1e06)
 
-    Pres += 0.5
+    Pres += 1
 
 k = 0
 # Loop to calculate the perfusion...
 while (k < len(Diameter_la)):
-    gradP_tot = (Pressure_in[k] - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pressure_in[k] - 11.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     Resistance_la = compartment_resistance(vis_la, l_la, Diameter_la[k] * 1e-6, n_la)
     Resistance_sa = compartment_resistance(vis_sa, l_sa, Diameter_sa[k] * 1e-6, n_sa)
     Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
@@ -433,6 +436,8 @@ while (k < len(Diameter_la)):
     Resistance_total = Resistance_total + Resistance_a + Resistance_v  # Calculate the total resistance....
     # print(Resistance_total)
     Q_tot = gradP_tot / Resistance_total
+    Diam_la = Diameter_la[k]*1e-6
+    Diam_sa = Diameter_sa[k]*1e-6
     Diam_a1 = Diam_a + (2 * d_t)
     Diam_c1 = Diam_c + (2 * d_t)
     Diam_la1 = Diam_la + (2 * d_t)
