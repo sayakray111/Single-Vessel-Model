@@ -49,28 +49,23 @@ meta = 0.0
 
 
 # This function is input into fsolve to calculate the Optimum Diameter for a particular pressure....
-def Tension2(D, *params):
-    Pres, Cpass, Cpassd, Cact, Cactd, Cactdd, Cmyo, Cshear, Cmeta, Ctonedd, D0, Diam_2, flag, N1, vis_1, xD = params
+def Tension2(Diam):
+    Diam_la = Diam[0]
+    Diam_sa = Diam[1]
     # Determine which diameter is which....
-    if (flag == 1):  # This flag will calculate for the large arteriole diameter... the small arteriole diameter..
-        Diam_la = D
-        Diam_sa = Diam_2
-    else:  # This flag will calculate for the small arteriole diameter... the large arteriole diameter..
-        Diam_la = Diam_2
-        Diam_sa = D
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 11.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 14) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
-    Resistance_la = compartment_resistance(vis_la, l_la, Diam_la, n_la)
-    Resistance_sa = compartment_resistance(vis_sa, l_sa, Diam_sa, n_sa)
-    Resistance_lac = compartment_resistance(vis_la, l_la, Diam_lac, n_la)
-    Resistance_sac = compartment_resistance(vis_sa, l_sa, Diam_sac, n_sa)
-    Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
-    Resistance_lv = compartment_resistance(vis_lv, l_lv, Diam_lv, n_lv)
-    Resistance_sv = compartment_resistance(vis_sv, l_sv, Diam_sv, n_sv)
-    Resistance_a = compartment_resistance(vis_a, l_a, Diam_a, n_a)
-    Resistance_v = compartment_resistance(vis_v, l_v, Diam_v, n_v)
+    Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la)
+    Resistance_sa  = compartment_resistance(vis_sa,l_sa,Diam_sa,n_sa)
+    Resistance_c   = compartment_resistance(vis_c,l_c,Diam_c,n_c)
+    Resistance_lv  = compartment_resistance(vis_lv,l_lv,Diam_lv,n_lv)
+    Resistance_sv  = compartment_resistance(vis_sv,l_sv,Diam_sv,n_sv)
+    Resistance_lac = compartment_resistance(vis_la,l_la,Diam_lac,n_la)
+    Resistance_sac = compartment_resistance(vis_sa,l_sa,Diam_sac,n_sa)
+    Resistance_a   = compartment_resistance(vis_a,l_a,Diam_a,n_a)
+    Resistance_v   = compartment_resistance(vis_v,l_v,Diam_v,n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v  # The total resistance is being calculated...
@@ -78,89 +73,115 @@ def Tension2(D, *params):
     Q_tot = gradP_tot / Resistance_total  # Calculates the value of total discharge...
     
     # -----------------------------------------------------
-    Q = Q_tot / N1  # Calculate the discharge for the specific case...
-    if (flag == 1):  # This is the case if it is the large arteriole....
-        shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_la, 3))
-        P1 = (Pres * 133.333) - (Q_tot * Resistance_a)
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
-        Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
-    else:  # This is the case when it is the small arteriole...
-        shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_sa, 3))
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
-        P1 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
-        Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the small arteriole...
+    Q_la = Q_tot / n_la  # Calculate the discharge for the specific case...
+    Q_sa = Q_tot / n_sa
+    shear_la = (32 * Q_la * vis_la) / ((np.pi) * math.pow(Diam_la, 3))
+    P1 = (Pres * 133.333) - (Q_tot * Resistance_a)
+    P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
+    Pmid_la = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
+    
+    shear_sa = (32 * Q_sa * vis_sa) / ((np.pi) * math.pow(Diam_sa, 3))
+    P22 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
+    P11 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
+    Pmid_sa = (P11 + P22) * 0.5  # The midpoint diameter of the small arteriole...
     # Calculating the consumption of ATP...
     cons = (Diam_la, Diam_sa, Q_tot)
     # Calculating the metabolic constant (SCR) ...
-    meta = SCR(xD, *cons)
-    lam_D = D / D0  # The ratio of diameters...
-    Stone = (Cmyo * (Pmid * D * 0.5)) + Ctonedd - (Cshear * shear) - (
-                Cmeta * meta)  # The stone is the tone of the vessel...
-    Act = 1 / (1 + np.exp(-Stone))  # The activation of the smooth muscles....
-    p1 = (lam_D - 1) * Cpassd
-    p2 = np.exp(p1)
-    Tpass = Cpass * p2
-    s1 = (lam_D - Cactd) / (Cactdd)
-    s2 = math.pow(s1, 2)
-    s3 = np.exp(-s2)
-    Tact = Cact * s3  # The activation of the active tension...
-    Ttot = Tpass + (Act * Tact)
-    return (Ttot) - (Pmid * D * 0.5)
+    meta_la = SCR(xD_la, *cons)
+    meta_sa = SCR(xD_sa, *cons)
+    lam_D_la = Diam_la/ D0_la  # The ratio of diameters...
+    lam_D_sa = Diam_sa/ D0_sa 
+    Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctonedd_la - (Cshear_la * shear_la) - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
+    Stone_sa = (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5)) + Ctonedd_sa - (Cshear_sa * shear_sa) - (Cmeta_sa * meta_sa)
+    Act_la = 1 / (1 + np.exp(-Stone_la))  # The activation of the smooth muscles....
+    Act_sa = 1 / (1 + np.exp(-Stone_sa)) 
+    p1_la = (lam_D_la - 1) * Cpassd_la
+    p1_sa = (lam_D_sa - 1) * Cpassd_sa
+    p2_la = np.exp(p1_la)
+    p2_sa = np.exp(p1_sa)
+    Tpass_la = Cpass_la * p2_la
+    Tpass_sa = Cpass_sa * p2_sa
+    s1_la = (lam_D_la - Cactd_la) / (Cactdd_la)
+    s1_sa = (lam_D_sa - Cactd_sa) / (Cactdd_sa)
+    s2_la = math.pow(s1_la, 2)
+    s2_sa = math.pow(s1_sa, 2)
+    s3_la = np.exp(-s2_la)
+    s3_sa = np.exp(-s2_sa)
+    Tact_la = Cact_la * s3_la  # The activation of the active tension...
+    Tact_sa = Cact_sa * s3_sa
+    Ttot_la = Tpass_la + (Act_la * Tact_la)
+    Ttot_sa = Tpass_sa + (Act_sa * Tact_sa)
+    return (Ttot_la) - (Pmid_la * Diam_la * 0.5), (Ttot_sa) - (Pmid_sa * Diam_sa * 0.5)
 
 
-def Activation(D, *params):
-    Pres, Cpass, Cpassd, Cact, Cactd, Cactdd, Cmyo, Cshear, Cmeta, Ctonedd, D0, Diam_2, flag, N1, vis_1, xD, flag2 = params
+def Activation(Pres,Diam,flag,flag2):
+    Diam_la = Diam[0]
+    Diam_sa = Diam[1]
     # Determine which diameter is which....
-    if (flag == 1):  # This flag will calculate for the large arteriole diameter... the small arteriole diameter..
-        Diam_la = D
-        Diam_sa = Diam_2
-    else:  # This flag will calculate for the small arteriole diameter... the large arteriole diameter..
-        Diam_la = Diam_2
-        Diam_sa = D
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 11.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 14) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
-    Resistance_la = compartment_resistance(vis_la, l_la, Diam_la, n_la)
-    Resistance_sa = compartment_resistance(vis_sa, l_sa, Diam_sa, n_sa)
-    Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
-    Resistance_lv = compartment_resistance(vis_lv, l_lv, Diam_lv, n_lv)
-    Resistance_sv = compartment_resistance(vis_sv, l_sv, Diam_sv, n_sv)
-    Resistance_a = compartment_resistance(vis_a, l_a, Diam_a, n_a)
-    Resistance_v = compartment_resistance(vis_v, l_v, Diam_v, n_v)
+    Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la)
+    Resistance_sa  = compartment_resistance(vis_sa,l_sa,Diam_sa,n_sa)
+    Resistance_c   = compartment_resistance(vis_c,l_c,Diam_c,n_c)
+    Resistance_lv  = compartment_resistance(vis_lv,l_lv,Diam_lv,n_lv)
+    Resistance_sv  = compartment_resistance(vis_sv,l_sv,Diam_sv,n_sv)
+    Resistance_lac = compartment_resistance(vis_la,l_la,Diam_lac,n_la)
+    Resistance_sac = compartment_resistance(vis_sa,l_sa,Diam_sac,n_sa)
+    Resistance_a   = compartment_resistance(vis_a,l_a,Diam_a,n_a)
+    Resistance_v   = compartment_resistance(vis_v,l_v,Diam_v,n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
+    Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v  # The total resistance is being calculated...
+    Resistance_totalc = Resistance_totalc + Resistance_a + Resistance_v
     Q_tot = gradP_tot / Resistance_total  # Calculates the value of total discharge...
+    
     # -----------------------------------------------------
-    Q = Q_tot / N1  # Calculate the discharge for the specific case...
-    if (flag == 1):  # This is the case if it is the large arteriole....
-        shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_la, 3))
-        P1 = (Pres * 133.333) - (Q_tot * Resistance_a)
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
-        Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
-    else:  # This is the case when it is the small arteriole...
-        shear = (32 * Q * vis_1) / ((np.pi) * math.pow(Diam_sa, 3))
-        P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
-        P1 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
-        Pmid = (P1 + P2) * 0.5  # The midpoint diameter of the small arteriole...
+    Q_la = Q_tot / n_la  # Calculate the discharge for the specific case...
+    Q_sa = Q_tot / n_sa
+    shear_la = (32 * Q_la * vis_la) / ((np.pi) * math.pow(Diam_la, 3))
+    P1 = (Pres * 133.333) - (Q_tot * Resistance_a)
+    P2 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
+    Pmid_la = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
+    
+    shear_sa = (32 * Q_sa * vis_sa) / ((np.pi) * math.pow(Diam_sa, 3))
+    P22 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
+    P11 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
+    Pmid_sa = (P11 + P22) * 0.5  # The midpoint diameter of the small arteriole...
     # Calculating the consumption of ATP...
     cons = (Diam_la, Diam_sa, Q_tot)
     # Calculating the metabolic constant (SCR) ...
-    meta = SCR(xD, *cons)
-    lam_D = D / D0  # The ratio of diameters...
-    Stone = (Cmyo * (Pmid * D * 0.5)) + Ctonedd - (Cshear * shear) - (
-                Cmeta * meta)  # The stone is the tone of the vessel...
-    Act = 1 / (1 + np.exp(-Stone))  # The activation of the smooth muscles....
-    if (flag2 == 1):
-        return Act
-    elif (flag2 == 2):
-        return (Cmyo * (Pmid * D * 0.5))
-    elif (flag2 == 3):
-        return (Cshear * shear)
-    elif (flag2 == 4):
-        return (Cmeta * meta)
+    meta_la = SCR(xD_la, *cons)
+    meta_sa = SCR(xD_sa, *cons)
+    lam_D_la = Diam_la/ D0_la  # The ratio of diameters...
+    lam_D_sa = Diam_sa/ D0_sa 
+    Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctonedd_la - (Cshear_la * shear_la) - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
+    Stone_sa = (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5)) + Ctonedd_sa - (Cshear_sa * shear_sa) - (Cmeta_sa * meta_sa)
+    Act_la = 1 / (1 + np.exp(-Stone_la))  # The activation of the smooth muscles....
+    Act_sa = 1 / (1 + np.exp(-Stone_sa))
+    if(flag ==1): 
+        if (flag2 == 1):
+            return Act_la
+        elif (flag2 == 2):
+            return (Cmyo_la * (Pmid_la * Diam_la * 0.5))
+        elif (flag2 == 3):
+            return (Cshear_la * shear_la)
+        elif (flag2 == 4):
+            return (Cmeta_la * meta_la)
+        else:
+            return Stone_la
     else:
-        return Stone
+        if (flag2 == 1):
+            return Act_sa
+        elif (flag2 == 2):
+            return (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5))
+        elif (flag2 == 3):
+            return (Cshear_sa * shear_sa)
+        elif (flag2 == 4):
+            return (Cmeta_sa * meta_sa)
+        else:
+            return Stone_sa
 
 
 # This function returns the saturation of Oxygen as a function of length....
@@ -188,7 +209,13 @@ def Saturation(x, *params1):
         return Saturation(1.61, *Pw2)
     else:
         return Saturation(1.97, *Pw2)
-    q1 = 0.25 * np.pi * M_0 * (((D + (37.6 * 1e-6)) * (D + (37.6 * 1e-6))) - (D * D))
+    Aw1 = np.pi*((n_a*l_a)+(n_la*l_la)+(n_sa*l_sa)+(n_c*l_c))
+    Aw2 = 2*np.pi*((n_a*l_a*Diam_a*0.5)+(n_la*l_la*D1*0.5)+(n_sa*l_sa*D2*0.5)+(n_c*l_c*Diam_c*0.5))
+    Aw3 = np.pi*((n_a*l_a*Diam_a*Diam_a*0.25)+(n_la*l_la*D1*D1*0.25)+(n_sa*l_sa*D2*D2*0.25)+(n_c*l_c*Diam_c*Diam_c*0.25))
+    Aw3 = Aw3+np.pi*((n_sv*l_sv*Diam_sv*Diam_sv*0.25)+(n_lv*l_lv*Diam_lv*Diam_lv*0.25)+(n_v*l_v*Diam_v*Diam_v*0.25))
+    Aw3 = Aw3 - ((n_c*l_c)/(500*1e06))
+    depth = (-Aw2+np.sqrt((Aw2*Aw2)-(4*Aw1*Aw3)))/(2*Aw1)
+    q1 = 0.25 * np.pi * M_0 * (((D + (2*depth)) * (D + (2*depth))) - (D * D))
     x = x * 1e-2
     A1 = S_i - (q1 / (Q * c0 * H_D)) * (x - X_i)
     if(A1<=0): return 0 # The Saturation is being returned based on the equation given in the report...
@@ -242,7 +269,13 @@ def Consumption(x, *params2):
         C = A1 * np.exp(-gamma1 * X) + alpha1
         return C
     else:
-        q1 = 0.25 * np.pi * M_0 * (((D + (37.6 * 1e-6)) * (D + (37.6 * 1e-6))) - (D * D))
+        Aw1 = np.pi*((n_a*l_a)+(n_la*l_la)+(n_sa*l_sa)+(n_c*l_c))
+        Aw2 = 2*np.pi*((n_a*l_a*Diam_a*0.5)+(n_la*l_la*D1*0.5)+(n_sa*l_sa*D2*0.5)+(n_c*l_c*Diam_c*0.5))
+        Aw3 = np.pi*((n_a*l_a*Diam_a*Diam_a*0.25)+(n_la*l_la*D1*D1*0.25)+(n_sa*l_sa*D2*D2*0.25)+(n_c*l_c*Diam_c*Diam_c*0.25))
+        Aw3 = Aw3+np.pi*((n_sv*l_sv*Diam_sv*Diam_sv*0.25)+(n_lv*l_lv*Diam_lv*Diam_lv*0.25)+(n_v*l_v*Diam_v*Diam_v*0.25))
+        Aw3 = Aw3 - ((n_c*l_c)/(500*1e06))
+        depth = (-Aw2+np.sqrt((Aw2*Aw2)-(4*Aw1*Aw3)))/(2*Aw1)
+        q1 = 0.25 * np.pi * M_0 * (((D + (2*depth)) * (D + (2*depth))) - (D * D))
         alpha = ((H_T * R_0) / (4 * k_d)) * ((D * (1 - (R_1 * S_i))) - (((1 - H_D) * R_1 * q1) / ((np.pi) * c0 * H_D * k_d)))
         beta = (D * H_T * R_0 * R_1 * q1) / (4 * Q * c0 * H_D * k_d)
         gamma = (k_d * (np.pi) * D) / (0.6 * Q)
@@ -276,12 +309,12 @@ vis_sv = 0.0256 * 0.1  # viscosity of small venule (Pa.s), directly from Arciero
 vis_lv = 0.0234 * 0.1  # viscosity of large venule (Pa.s), directly from Arciero et al
 vis_v = 0.0250 * 0.1  # viscosity of vein (Pa.s), directly from Arciero et al
 # Diameters of the artery.....This is done to calculate the diameter of the artery and the vein from their resistances...
-Resistance_a = 1.88 * 1e11*133.333
+Resistance_a = 1.88 * 1e11*133
 G = (128 * vis_a * l_a) / (np.pi * Resistance_a * n_a)
 Diam_a = math.pow(G, 0.25)
 print('Diameter of the main artery is = ', Diam_a * 1e06)
 # Diameters of the vein....This is done to calculate the diameter of the artery and the vein from their resistances...
-Resistance_v = 0.19 * 1e11*133.333
+Resistance_v = 0.19 * 1e11*133
 G = (128 * vis_v * l_v) / (np.pi * Resistance_v * n_v)
 Diam_v = math.pow(G, 0.25)
 print('Diameter of the main vein is = ', Diam_v * 1e06)
@@ -344,6 +377,8 @@ xend_sa = 1.56e-2
 xend_c = 1.61e-2
 xend_sv = 1.97e-2
 xend_lv = 2.56e-2
+xD_la = 0.90
+xD_sa = 1.38
 d_t = 18.8 * 1e-6
 # Coefficients for large arteriole.... adapted from the paper.
 Cpass_la = 1.043
@@ -372,59 +407,46 @@ Ctonedd_sa = 10.66
 
 Activation_la = []
 # Assumed to be 14 mmHg.
-
+D = [Diam_la,Diam_sa]
 Pres = 20  ## For the passive myogenic shear and metabolic case...
 while (Pres <= 200):
     # List of parameters of the large arteriole...
-    params = (
-    Pres, Cpass_la, Cpassd_la, Cact_la, Cactd_la, Cactdd_la, Cmyo_la, Cshear_la, Cmeta_la, Ctonedd_la, D0_la, Diam_sa,
-    1, n_la, vis_la, 0.90)
+    params1 = (
+    Pres, Cpass_la, Cpassd_la, Cact_la, Cactd_la, Cactdd_la, Cmyo_la, Cshear_la, Cmeta_la, Ctonedd_la, D0_la,
+    n_la, vis_la, xD_la,Cpass_sa, Cpassd_sa, Cact_sa, Cactd_sa, Cactdd_sa, Cmyo_sa, Cshear_sa, Cmeta_sa, Ctonedd_sa, D0_sa,
+    n_sa, vis_sa, xD_sa)
     # Solve for the diameter of the large arteriole...
-    Diam_la = fsolve(Tension2, Diam_la, args=params)
-    k = Tension2(Diam_la, *params)
+    D = fsolve(Tension2, D)
+    k1,k2 = Tension2(D)
+    #print('The value of error for large arteriole = ',abs(k1),' and the value is ',D[0],'Pressure is = ',Pres)
+    #print('The value of error for small arteriole = ',abs(k2),'and the value is ',D[1],'Pressure is = ',Pres)
     # Calculate the optimum diameter to reduce the number of fluctuations...
-    if (abs(k) > 1e-12 or Diam_la < 1e-5):
+    if (abs(k1) > 1e-08 or abs(k2) > 1e-07):
         n = 1
         while (True):
-            Diam_la = (Diameter_la[-n] * 1e-6) + (n * 1e-8)
-
-            Diam_la = fsolve(Tension2, Diam_la, args=params)
-            print('Hitting a hole at a diameter (large) = ', Diam_la, ' Pressure  = ', Pres)
-            k = Tension2(Diam_la, *params)
-            print('error is = ', k)
-            if (Diam_la > 3.5e-5 and abs(k) < 1e-8):
+            print('Hitting a hole at a diameter (large) = ', D[0], ' Pressure  = ', Pres)
+            D1 = (Diameter_la[-1] * 1e-6) + (n * 1e-6)
+            D2 = (Diameter_sa[-1] * 1e-6) + (n * 1e-6)
+            D = [D1,D2]
+            D = fsolve(Tension2, D)
+            k4,k5 = Tension2(D)
+            print('error is = ', k4,' and ',k5)
+            if (abs(k4) < 1e-4 and abs(k5) < 1e-4):
                 break
             n += 1
 
-    # List of parameters for small arteriole...
-    params = (
-    Pres, Cpass_sa, Cpassd_sa, Cact_sa, Cactd_sa, Cactdd_sa, Cmyo_sa, Cshear_sa, Cmeta_sa, Ctonedd_sa, D0_sa, Diam_la,
-    2, n_sa, vis_sa, 1.38)
-    # Solve for the diameter of small arteriole...
-    Diam_sa = fsolve(Tension2, Diam_sa, args=params)
-    k = Tension2(Diam_sa, *params)
-    if (Diam_sa < 1e-6 or abs(k) > 1e-10):
-        n = 1
-        while (True):  # Loop to calculate an optimum diameter to reduce the fluctuations....
-            Diam_sa = (Diameter_sa[-1] * 1e-6) + (n * 1e-7)
-            Diam_sa = fsolve(Tension2, Diam_sa, args=params)
-            print('Hitting a hole at a diameter (small) = ', Diam_sa, ' Pressure = ', Pres)
-            k = Tension2(Diam_sa, *params)
-            print('error is small = ', k)
-            if (Diam_sa < 3e-5 and abs(k) < 1e-6):
-                break
-            n += 1
+    
     # Store the pressures and diameters....
     Pressure_in.append(Pres)
-    Diameter_la.append(Diam_la * 1e06)
-    Diameter_sa.append(Diam_sa * 1e06)
+    Diameter_la.append(D[0] * 1e06)
+    Diameter_sa.append(D[1] * 1e06)
 
     Pres += 1
 
 k = 0
 # Loop to calculate the perfusion...
 while (k < len(Diameter_la)):
-    gradP_tot = (Pressure_in[k] - 11.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pressure_in[k] - 14) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     Resistance_la = compartment_resistance(vis_la, l_la, Diameter_la[k] * 1e-6, n_la)
     Resistance_sa = compartment_resistance(vis_sa, l_sa, Diameter_sa[k] * 1e-6, n_sa)
     Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
@@ -438,6 +460,12 @@ while (k < len(Diameter_la)):
     Q_tot = gradP_tot / Resistance_total
     Diam_la = Diameter_la[k]*1e-6
     Diam_sa = Diameter_sa[k]*1e-6
+    Aw1 = np.pi*((n_a*l_a)+(n_la*l_la)+(n_sa*l_sa)+(n_c*l_c))
+    Aw2 = 2*np.pi*((n_a*l_a*Diam_a*0.5)+(n_la*l_la*Diam_la*0.5)+(n_sa*l_sa*Diam_sa*0.5)+(n_c*l_c*Diam_c*0.5))
+    Aw3 = np.pi*((n_a*l_a*Diam_a*Diam_a*0.25)+(n_la*l_la*Diam_la*Diam_la*0.25)+(n_sa*l_sa*Diam_sa*Diam_sa*0.25)+(n_c*l_c*Diam_c*Diam_c*0.25))
+    Aw3 = Aw3+np.pi*((n_sv*l_sv*Diam_sv*Diam_sv*0.25)+(n_lv*l_lv*Diam_lv*Diam_lv*0.25)+(n_v*l_v*Diam_v*Diam_v*0.25))
+    Aw3 = Aw3 - ((n_c*l_c)/(500*1e06))
+    d_t = (-Aw2+np.sqrt((Aw2*Aw2)-(4*Aw1*Aw3)))/(2*Aw1)
     Diam_a1 = Diam_a + (2 * d_t)
     Diam_c1 = Diam_c + (2 * d_t)
     Diam_la1 = Diam_la + (2 * d_t)
@@ -508,18 +536,10 @@ Acti_shear_test = []
 Acti_meta_test = []
 k1 = 0
 while (k1 < len(Diameter_la)):
-    params_myo = (
-    Pressure_in[k1], Cpass_la, Cpassd_la, Cact_la, Cactd_la, Cactdd_la, Cmyo_la, Cshear_la, Cmeta_la, Ctonedd_la, D0_la,
-    Diameter_sa[k1]*1e-6, 1, n_la, vis_la, 0.90, 2)
-    params_shear = (
-    Pressure_in[k1], Cpass_la, Cpassd_la, Cact_la, Cactd_la, Cactdd_la, Cmyo_la, Cshear_la, Cmeta_la, Ctonedd_la, D0_la,
-    Diameter_sa[k1]*1e-6, 1, n_la, vis_la, 0.90, 3)
-    params_meta = (
-    Pressure_in[k1], Cpass_la, Cpassd_la, Cact_la, Cactd_la, Cactdd_la, Cmyo_la, Cshear_la, Cmeta_la, Ctonedd_la, D0_la,
-    Diameter_sa[k1]*1e-6, 1, n_la, vis_la, 0.90, 4)
-    Acti_myo.append(Activation(Diameter_la[k1] * 1e-6, *params_myo))
-    Acti_shear.append(Activation(Diameter_la[k1] * 1e-6, *params_shear))
-    Acti_meta.append(Activation(Diameter_la[k1] * 1e-6, *params_meta))
+    DF = [Diameter_la[k1]*1e-6,Diameter_sa[k1]*1e-6]
+    Acti_myo.append(Activation(Pressure_in[k1],DF, 1,2))
+    Acti_shear.append(Activation(Pressure_in[k1],DF,1,3))
+    Acti_meta.append(Activation(Pressure_in[k1],DF,1,4))
     k1 += 1
 # Plot the various activations.....
 for d in csv.DictReader(open('./Activation(Myo).csv')):
