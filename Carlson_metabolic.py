@@ -480,10 +480,10 @@ while (k < len(Diameter_la)):
     vol_v = np.pi * 0.25 * (Diam_v * Diam_v) * l_v * n_v
     vol_tot = vol_la + vol_sa + vol_c + vol_lv + vol_sv + vol_a + vol_v
     perfuse = Q_tot / (vol_tot)  # Calculate the total perfusion....
-    perfusion.append(perfuse)  # The perfusion values are to be collected...
+    perfusion.append(Q_tot)  # The perfusion values are to be collected...
 
     if (Pressure_in[k] == 100):
-        perfuse_100 = perfuse  # The value of this perfusion is around 0.0117 it is quite same with 0.0118.
+        perfuse_100 = Q_tot  # The value of this perfusion is around 0.0117 it is quite same with 0.0118.
         # This value is taken from the paper at the control state...
         print('Perfusion=', perfuse_100)
 
@@ -500,7 +500,7 @@ Test_perfusion = []
 # gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 # print(Diameter_sa)
 # print(S3)
-for d in csv.DictReader(open('./Carlson_2008(myo+shear+meta).csv')):
+for d in csv.DictReader(open('./Pressure-Dia(meta).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_Diameter.append(float(d['Diameter']))
 for d in csv.DictReader(open('./perfusion(myo+shear+meta).csv')):
