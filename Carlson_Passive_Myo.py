@@ -1,4 +1,5 @@
-# Written by Sayak Ray of the university of Auckland
+# Written by Sayak Ray of the university of Auckland....
+# This one only generates the Pressure-Diameter curve....
 import numpy as np
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
