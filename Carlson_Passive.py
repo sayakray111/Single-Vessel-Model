@@ -69,7 +69,7 @@ def Tension2(Diam):
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v  # The total resistance is being calculated...
-    Resistance_totalc = Resistance_totalc + Resistance_a #+ Resistance_v
+    Resistance_totalc = Resistance_totalc + Resistance_a 
     Q_tot = gradP_tot / Resistance_total  # Calculates the value of total discharge...
     
     # -----------------------------------------------------
@@ -87,12 +87,14 @@ def Tension2(Diam):
     # Calculating the consumption of ATP...
     cons = (Diam_la, Diam_sa, Q_tot)
     # Calculating the metabolic constant (SCR) ...
-    meta_la = SCR(xD_la, *cons)
-    meta_sa = SCR(xD_sa, *cons)
+    #meta_la = SCR(xD_la, *cons)
+    #meta_sa = SCR(xD_sa, *cons)
     lam_D_la = Diam_la/ D0_la  # The ratio of diameters...
     lam_D_sa = Diam_sa/ D0_sa 
-    Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctonedd_la - (Cshear_la * shear_la) - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
-    Stone_sa = (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5)) + Ctonedd_sa - (Cshear_sa * shear_sa) - (Cmeta_sa * meta_sa)
+    #Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctonedd_la - (Cshear_la * shear_la) - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
+    #Stone_sa = (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5)) + Ctonedd_sa - (Cshear_sa * shear_sa) - (Cmeta_sa * meta_sa)
+    Stone_la = 0.0
+    Stone_sa = 0.0
     Act_la = 1 / (1 + np.exp(-Stone_la))  # The activation of the smooth muscles....
     Act_sa = 1 / (1 + np.exp(-Stone_sa)) 
     p1_la = (lam_D_la - 1) * Cpassd_la
@@ -109,9 +111,12 @@ def Tension2(Diam):
     s3_sa = np.exp(-s2_sa)
     Tact_la = Cact_la * s3_la  # The activation of the active tension...
     Tact_sa = Cact_sa * s3_sa
-    Ttot_la = Tpass_la
-    Ttot_sa = Tpass_sa
+    Ttot_la = Tpass_la #+ (Act_la * Tact_la)
+    Ttot_sa = Tpass_sa #+ (Act_sa * Tact_sa)
     return (Ttot_la) - (Pmid_la * Diam_la * 0.5), (Ttot_sa) - (Pmid_sa * Diam_sa * 0.5)
+
+
+
 
 # This function returns the saturation of Oxygen as a function of length....
 def Saturation(x, *params1):
@@ -373,9 +378,9 @@ while (Pres <= 200):
     Pres += 1
 
 k = 0
-# Loop to calculate the perfusion...
 Pressure_la = []
 Pressure_sa = []
+# Loop to calculate the perfusion...
 while (k < len(Diameter_la)):
     gradP_tot = (Pressure_in[k] - 12.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     Resistance_la = compartment_resistance(vis_la, l_la, Diameter_la[k] * 1e-6, n_la)
@@ -386,20 +391,19 @@ while (k < len(Diameter_la)):
     Resistance_a = compartment_resistance(vis_a, l_a, Diam_a, n_a)
     Resistance_v = compartment_resistance(vis_v, l_v, Diam_v, n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
-    Resistance_total = Resistance_total + Resistance_a# + Resistance_v  # Calculate the total resistance....
-    # print(Resistance_total)
+    Resistance_total = Resistance_total + Resistance_a # Calculate the total resistance....
     Q_tot = gradP_tot / Resistance_total
-    Diam_la = Diameter_la[k]*1e-6
-    Diam_sa = Diameter_sa[k]*1e-6
+    
     P1 = (Pressure_in[k] * 133.333) - (Q_tot * Resistance_a)
     P2 = (Pressure_in[k] * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la)
-    Pmid_la = (P1 + P2) * 0.5
+    Pmid_la = (P1 + P2) * 0.5  # The midpoint diameter of the large arteriole...
+    Pressure_la.append(Pmid_la/133.33)
     P22 = (Pressure_in[k] * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
     P11 = (Pressure_in[k] * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
-    Pmid_sa = (P11 + P22) * 0.5
-    perfusion.append(Q_tot)  # The perfusion values are to be collected...
-    Pressure_la.append(Pmid_la/133.33)
+    Pmid_sa = (P11 + P22) * 0.5 
     Pressure_sa.append(Pmid_sa/133.33)
+    perfusion.append(Q_tot)  # The perfusion values are to be collected...
+
     if (Pressure_in[k] == 100):
         perfuse_100 = 6.939226301150093e-11  # The value of this perfusion is around 0.0117 it is quite same with 0.0118.
         # This value is taken from the paper at the control state...
@@ -420,15 +424,13 @@ Test_perfusion = []
 # gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 # print(Diameter_sa)
 # print(S3)
-for d in csv.DictReader(open('D:/Photos/My_Work/Carlson(2008)_dataP.csv')):
+for d in csv.DictReader(open('./Carlson(2008)_dataP.csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_Diameter.append(float(d['Diameter']))
-for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(passive).csv')):
+for d in csv.DictReader(open('./perfusion(passive).csv')):
     Test_Pressure1.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
-for d in csv.DictReader(open('D:/Photos/My_Work/Pressure-Dia(meta)(SA).csv')):
-    Test_Pressure2.append(float(d['Pressure']))
-    Test_Diameter1.append(float(d['Diameter']))
+
 # print('Pressure = ', Test_Pressure)
 # print('Diameter = ', Test_Diameter)
 plt.figure(figsize=(10, 9))
@@ -446,4 +448,21 @@ plt.xlim(0, 200)
 plt.ylim(0, 3)
 plt.plot(Test_Pressure1, Test_perfusion, 'b')
 plt.plot(Pressure_in, perfusion_norm, 'r')
-plt.show()
+interpolated = np.interp(Pressure_la, Test_Pressure, Test_Diameter).tolist()
+k = 0
+sum222 = 0.0
+while(k<len(interpolated)):
+    sum222 = sum222+(abs(interpolated[k]-Diameter_la[k])/(interpolated[k]))
+    k+=1
+avg = sum222/(len(interpolated))
+print('the error in Diameter large arteriole = ',avg*100)
+interpolated1 = np.interp(Pressure_in, Test_Pressure1, Test_perfusion).tolist()
+k = 0
+sum221 = 0.0
+while(k<len(interpolated1)):
+    sum221 = sum221+(abs(interpolated1[k]-perfusion_norm[k])/(interpolated1[k]))
+    if(perfusion_norm[k]>3.0):
+        break
+    k+=1
+avg = sum221/(k)
+print('the error in Perfusion  = ',avg*100)
