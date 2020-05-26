@@ -83,13 +83,15 @@ def Tension2(Diam):
     P22 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
     P11 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
     Pmid_sa = (P11 + P22) * 0.5  # The midpoint diameter of the small arteriole...
-    shear_la = 5.5
-    shear_sa = 5.5
+    #shear_la = 5.5
+    #shear_sa = 5.5
+    shear_la = 0.0
+    shear_sa = 0.0
     # Calculating the consumption of ATP...
     cons = (Diam_la, Diam_sa, Q_tot)
     # Calculating the metabolic constant (SCR) ...
-    meta_la = SCR(xD_la, *cons)
-    meta_sa = SCR(xD_sa, *cons)
+    #meta_la = SCR(xD_la, *cons)
+    #meta_sa = SCR(xD_sa, *cons)
     lam_D_la = Diam_la/ D0_la  # The ratio of diameters...
     lam_D_sa = Diam_sa/ D0_sa 
     Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctoned_la - (Cshear_la * shear_la) #- (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
@@ -265,8 +267,6 @@ Diam_lac1 = Diam_lac + (2 * d_t)
 Diam_sa1 = Diam_sa + (2 * d_t)
 Diam_sac1 = Diam_sac + (2 * d_t)
 Diam_c1 = Diam_c + (2 * d_t)
-Diam_sv1 = Diam_sv + (2 * d_t)
-Diam_lv1 = Diam_lv + (2 * d_t)
 ####### Initialise certain list and values 
 perfuse = 1.0
 perfusion = []  # List to store the values of the perfusion...
@@ -318,7 +318,7 @@ Cactdd_la = 0.2905
 Cmyo_la = 10.1
 Cshear_la = 0.258
 Cmeta_la = 3 * 1e06
-Ctoned_la = -2.22
+Ctoned_la = -5.22
 Ctonedd_la = 10.11
 D0_la = 156.49 * 1e-6
 # Coefficients for small arteriole... adapted from the paper.
@@ -329,7 +329,7 @@ Cactd_sa = 0.750
 Cactdd_sa = 0.384
 Cmyo_sa = 35.9
 Cshear_sa = 0.258
-Ctoned_sa = -0.53
+Ctoned_sa = -17.53
 Cmeta_sa = 3 * 1e06
 D0_sa = 38.99 * 1e-6
 Ctonedd_sa = 10.66
@@ -365,11 +365,6 @@ while (Pres <= 200):
     Pressure_in.append(Pres)
     Diameter_la.append(D[0] * 1e06)
     Diameter_sa.append(D[1] * 1e06)
-    if(Pres == 100):
-        Do = D[0]
-        Di = D[1]
-        print('the diameter = ',Do*1e06,'the diameter of the large arteriole at the control state')
-        print('the diameter = ',Di*1e06,'the diameter of the small arteriole at the control state')
     Pres += 1
 
 k = 0
@@ -386,7 +381,7 @@ while (k < len(Diameter_la)):
     Resistance_a = compartment_resistance(vis_a, l_a, Diam_a, n_a)
     Resistance_v = compartment_resistance(vis_v, l_v, Diam_v, n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
-    Resistance_total = Resistance_total + Resistance_a  # Calculate the total resistance....
+    Resistance_total = Resistance_total + Resistance_a # Calculate the total resistance....
     # print(Resistance_total)
     Q_tot = gradP_tot / Resistance_total
     Diam_la = Diameter_la[k]*1e-6
@@ -432,7 +427,7 @@ for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(myo).csv')):
 plt.figure(figsize=(10, 9))
 plt.subplot(311)
 plt.xlabel('Pressure(mmHg)')
-plt.ylabel('Diameter(micrometer)')
+plt.ylabel('Perfusion')
 plt.xlim(0, 200)
 plt.ylim(0, 180)
 plt.plot(Test_Pressure, Test_Diameter, 'b')
@@ -445,3 +440,19 @@ plt.ylim(0, 3)
 plt.plot(Test_Pressure1, Test_perfusion, 'b')
 plt.plot(Pressure_in, perfusion_norm, 'r')
 plt.show()
+interpolated1 = np.interp(Pressure_in, Test_Pressure1, Test_perfusion).tolist()
+k = 0
+sum221 = 0.0
+while(k<len(interpolated1)):
+    sum221 = sum221+(abs(interpolated1[k]-perfusion_norm[k])/(interpolated1[k]))
+    k+=1
+avg = sum221/(len(interpolated1))
+print('the error in Perfusion  = ',avg*100)
+interpolated = np.interp(Pressure_la, Test_Pressure, Test_Diameter).tolist()
+k = 0
+sum222 = 0.0
+while(k<len(interpolated)):
+    sum222 = sum222+(abs(interpolated[k]-Diameter_la[k])/(interpolated[k]))
+    k+=1
+avg = sum222/(len(interpolated))
+print('the error in Diameter large arteriole = ',avg*100)
