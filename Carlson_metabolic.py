@@ -54,7 +54,7 @@ def Tension2(Diam):
     Diam_sa = Diam[1]
     # Determine which diameter is which....
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 12.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la)
@@ -69,7 +69,7 @@ def Tension2(Diam):
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_total = Resistance_total + Resistance_a + Resistance_v  # The total resistance is being calculated...
-    Resistance_totalc = Resistance_totalc + Resistance_a #+ Resistance_v
+    Resistance_totalc = Resistance_totalc + Resistance_a
     Q_tot = gradP_tot / Resistance_total  # Calculates the value of total discharge...
     
     # -----------------------------------------------------
@@ -119,7 +119,7 @@ def Activation(Pres,Diam,flag,flag2):
     Diam_sa = Diam[1]
     # Determine which diameter is which....
     # Calculate the Discharge for the given diameters and their initial guesses...
-    gradP_tot = (Pres - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pres - 12.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     # End vein pressure assumed to be 14mmHg
     # Calculating the resistances here ....
     Resistance_la  = compartment_resistance(vis_la,l_la,Diam_la,n_la)
@@ -133,8 +133,8 @@ def Activation(Pres,Diam,flag,flag2):
     Resistance_v   = compartment_resistance(vis_v,l_v,Diam_v,n_v)
     Resistance_total = Resistance_sa + Resistance_la + Resistance_c + Resistance_lv + Resistance_sv
     Resistance_totalc = Resistance_sac + Resistance_lac + Resistance_c + Resistance_lv + Resistance_sv
-    Resistance_total = Resistance_total + Resistance_a + Resistance_v  # The total resistance is being calculated...
-    Resistance_totalc = Resistance_totalc + Resistance_a #+ Resistance_v
+    Resistance_total = Resistance_total + Resistance_a # The total resistance is being calculated...
+    Resistance_totalc = Resistance_totalc + Resistance_a
     Q_tot = gradP_tot / Resistance_total  # Calculates the value of total discharge...
     # -----------------------------------------------------
     Q_la = Q_tot / n_la  # Calculate the discharge for the specific case...
@@ -444,7 +444,7 @@ while (Pres <= 200):
 k = 0
 # Loop to calculate the perfusion...
 while (k < len(Diameter_la)):
-    gradP_tot = (Pressure_in[k] - 13) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+    gradP_tot = (Pressure_in[k] - 12.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
     Resistance_la = compartment_resistance(vis_la, l_la, Diameter_la[k] * 1e-6, n_la)
     Resistance_sa = compartment_resistance(vis_sa, l_sa, Diameter_sa[k] * 1e-6, n_sa)
     Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
@@ -482,7 +482,7 @@ while (k < len(Diameter_la)):
     perfusion.append(Q_tot)  # The perfusion values are to be collected...
 
     if (Pressure_in[k] == 100):
-        perfuse_100 = Q_tot  # The value of this perfusion is around 0.0117 it is quite same with 0.0118.
+        perfuse_100 = 6.939226301150093e-11  # The value of this perfusion is around 0.0117 it is quite same with 0.0118.
         # This value is taken from the paper at the control state...
         print('Perfusion=', perfuse_100)
 
@@ -499,10 +499,10 @@ Test_perfusion = []
 # gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 # print(Diameter_sa)
 # print(S3)
-for d in csv.DictReader(open('./Pressure-Dia(meta).csv')):
+for d in csv.DictReader(open('D:/Photos/My_Work/Pressure-Dia(meta).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_Diameter.append(float(d['Diameter']))
-for d in csv.DictReader(open('./perfusion(myo+shear+meta).csv')):
+for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(myo+shear+meta).csv')):
     Test_Pressure1.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 # print('Pressure = ', Test_Pressure)
@@ -541,13 +541,13 @@ while (k1 < len(Diameter_la)):
     Acti_meta.append(Activation(Pressure_in[k1],DF,1,4))
     k1 += 1
 # Plot the various activations.....
-for d in csv.DictReader(open('./Activation(Myo).csv')):
+for d in csv.DictReader(open('D:/Photos/My_Work/Activation(Myo).csv')):
     Test_Pressure2.append(float(d['Pressure']))
     Acti_myo_test.append(float(d['Activation']))
-for d in csv.DictReader(open('./Activation(Shear).csv')):
+for d in csv.DictReader(open('D:/Photos/My_Work/Activation(Shear).csv')):
     Test_Pressure3.append(float(d['Pressure']))
     Acti_shear_test.append(float(d['Activation']))
-for d in csv.DictReader(open('./Activation(Meta).csv')):
+for d in csv.DictReader(open('D:/Photos/My_Work/Activation(Meta).csv')):
     Test_Pressure4.append(float(d['Pressure']))
     Acti_meta_test.append(float(d['Activation']))
 plt.xlabel('Pressure(mmHg)')
