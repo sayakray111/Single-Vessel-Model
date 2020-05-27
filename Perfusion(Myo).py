@@ -425,7 +425,7 @@ Test_perfusion = []
 # print(Diameter_sa)
 # print(S3)
 
-for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(myo).csv')):
+for d in csv.DictReader(open('./perfusion(myo).csv')):
     Test_Pressure1.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 
