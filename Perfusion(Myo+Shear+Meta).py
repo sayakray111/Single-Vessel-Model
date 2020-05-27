@@ -500,10 +500,10 @@ Test_perfusion = []
 # gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 # print(Diameter_sa)
 # print(S3)
-for d in csv.DictReader(open('D:/Photos/My_Work/Pressure-Dia(meta).csv')):
+for d in csv.DictReader(open('./Pressure-Dia(meta).csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_Diameter.append(float(d['Diameter']))
-for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(myo+shear+meta).csv')):
+for d in csv.DictReader(open('./perfusion(myo+shear+meta).csv')):
     Test_Pressure1.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 # print('Pressure = ', Test_Pressure)
@@ -542,13 +542,13 @@ while (k1 < len(Diameter_la)):
     Acti_meta.append(Activation(Pressure_in[k1],DF,1,4))
     k1 += 1
 # Plot the various activations.....
-for d in csv.DictReader(open('D:/Photos/My_Work/Activation(Myo).csv')):
+for d in csv.DictReader(open('./Activation(Myo).csv')):
     Test_Pressure2.append(float(d['Pressure']))
     Acti_myo_test.append(float(d['Activation']))
-for d in csv.DictReader(open('D:/Photos/My_Work/Activation(Shear).csv')):
+for d in csv.DictReader(open('./Activation(Shear).csv')):
     Test_Pressure3.append(float(d['Pressure']))
     Acti_shear_test.append(float(d['Activation']))
-for d in csv.DictReader(open('D:/Photos/My_Work/Activation(Meta).csv')):
+for d in csv.DictReader(open('./Activation(Meta).csv')):
     Test_Pressure4.append(float(d['Pressure']))
     Acti_meta_test.append(float(d['Activation']))
 plt.xlabel('Pressure(mmHg)')
