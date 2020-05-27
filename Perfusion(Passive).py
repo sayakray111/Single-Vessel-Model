@@ -425,10 +425,10 @@ Test_perfusion = []
 # gradP_100 = ((70.9 / 6000) * (Resistance_total100) * vol_100) / 133
 # print(Diameter_sa)
 # print(S3)
-for d in csv.DictReader(open('D:/Photos/My_Work/Carlson(2008)_dataP.csv')):
+for d in csv.DictReader(open('./Carlson(2008)_dataP.csv')):
     Test_Pressure.append(float(d['Pressure']))
     Test_Diameter.append(float(d['Diameter']))
-for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(passive).csv')):
+for d in csv.DictReader(open('./perfusion(passive).csv')):
     Test_Pressure1.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 
