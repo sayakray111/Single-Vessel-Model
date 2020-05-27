@@ -84,8 +84,8 @@ def Tension2(Diam):
     P22 = (Pres * 133.333) - (Q_tot * Resistance_a) - (Q_tot * Resistance_la) - (Q_tot * Resistance_sa)
     P11 = (Pres * 133.333) - (Q_tot * Resistance_la) - (Q_tot * Resistance_a)
     Pmid_sa = (P11 + P22) * 0.5  # The midpoint diameter of the small arteriole...
-    shear_la = 5.5
-    shear_sa = 5.5
+    #shear_la = 5.5
+    #shear_sa = 5.5
     #shear_la = 0.0
     #shear_sa = 0.0
     # Calculating the consumption of ATP...
@@ -340,7 +340,7 @@ Ctonedd_sa = 10.66
 Activation_la = []
 # Assumed to be 14 mmHg.
 D = [Diam_la,Diam_sa]
-Pres = 20  ## For the passive myogenic shear and metabolic case...
+Pres = 45  ## For the passive myogenic shear and metabolic case...
 Tlac = 100*133.33*Diam_lac*0.5
 meta_la = ((Cmyo_la*Tlac)-(Cshear_la*5.5)+Ctonedd_la)/Cmeta_la
 print(meta_la)
@@ -425,7 +425,7 @@ Test_perfusion = []
 # print(Diameter_sa)
 # print(S3)
 
-for d in csv.DictReader(open('D:/Photos/My_Work/perfusion(myo).csv')):
+for d in csv.DictReader(open('./perfusion(myo+shear).csv')):
     Test_Pressure1.append(float(d['Pressure']))
     Test_perfusion.append(float(d['Perfusion']))
 
