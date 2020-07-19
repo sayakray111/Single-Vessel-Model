@@ -1,4 +1,4 @@
-# Written by Sayak Ray of the university of Auckland
+
 # This code generates the Pressure-Diameter and Perfusion-Pressure for the Metabolic case...
 import numpy as np
 from scipy.optimize import fsolve
