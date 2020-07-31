@@ -1,5 +1,9 @@
 
-from src import Perfusion(Myo+Shear+Meta) as perf
+import src.Perfusion1
+import src.Perfusion2
+import src.Perfusion3
+import src.Perfusion4
+import src.Perfusion5
 import matplotlib.pyplot as plt
 
 def is_float(str):
@@ -25,19 +29,14 @@ def read_file(filename):
             continue
     return {'Pressure':Test_Pressure,'Perfusion':Test_Perfusion}
 
-def check_perfusion_meta():
+def check_perfusion4():
     Test_Pressure = []
     Test_Perfusion = []
     D1= read_file('../files/perfusion(myo+shear+meta).csv')
     for l,k in zip(D1['Pressure'],D1['Perfusion']):
         Test_Pressure.append(l)
         Test_Perfusion.append(k)
-    plt.xlim(0, 200)
-    plt.ylim(0, 3)
-    plt.xlabel('Pressure')
-    plt.ylabel('Perfusion')
-    plt.plot(Test_Pressure, Test_Perfusion,'r')
-    plt.show()
+
 
 
 
