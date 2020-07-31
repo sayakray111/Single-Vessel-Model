@@ -1,6 +1,5 @@
-import sys
-sys.path.append('/hpc/sray036/Single-Vessel-Model/src')
 
+from src import Perfusion(Myo+Shear+Meta) as perf
 import matplotlib.pyplot as plt
 
 def is_float(str):
