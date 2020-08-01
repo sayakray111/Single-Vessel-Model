@@ -8,7 +8,7 @@ import csv
 import scipy.io
 import scipy.integrate as integrate
 
-def Perfusion3():
+def Perfusion_shear():
     def compartment_resistance(viscosity, length, diameter, number_in_generation):
         resistance = (128. * viscosity * length) / (np.pi * math.pow(diameter, 4.) * number_in_generation)
         return resistance
@@ -95,8 +95,7 @@ def Perfusion3():
         # meta_sa = 4.261014926666667e-06
         lam_D_la = Diam_la / D0_la  # The ratio of diameters...
         lam_D_sa = Diam_sa / D0_sa
-        Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctoned_la - (
-                    Cshear_la * shear_la)  # - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
+        Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctoned_la - (Cshear_la * shear_la)  # - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
         Stone_sa = (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5)) + Ctoned_sa - (Cshear_sa * shear_sa)  # - (Cmeta_sa * meta_sa)
         Act_la = 1 / (1 + np.exp(-Stone_la))  # The activation of the smooth muscles....
         Act_sa = 1 / (1 + np.exp(-Stone_sa))

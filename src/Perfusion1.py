@@ -7,7 +7,7 @@ import math
 import csv
 import scipy.io
 import scipy.integrate as integrate
-def Perfusion1():
+def Perfusion_pass():
     def compartment_resistance(viscosity, length, diameter, number_in_generation):
         resistance = (128. * viscosity * length) / (np.pi * math.pow(diameter, 4.) * number_in_generation)
         return resistance

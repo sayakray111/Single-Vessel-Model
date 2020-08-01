@@ -8,7 +8,7 @@ import csv
 import scipy.io
 import scipy.integrate as integrate
 
-def Perfusion4():
+def Perfusion_meta():
     def compartment_resistance(viscosity, length, diameter, number_in_generation):
         resistance = (128. * viscosity * length) / (np.pi * math.pow(diameter, 4.) * number_in_generation)
         return resistance
@@ -501,6 +501,7 @@ def Perfusion4():
         Acti_meta.append(Activation(Pressure_in[k1], DF, 1, 4))
         k1 += 1
     # Plot the various activations.....
+    return {'Pressure':Pressure_in,'Diameter(LA)':Diameter_la,'Diameter(SA)':Diameter_sa,'Normalised Perfusion':perfusion_norm,'Activation(Myo)':Acti_myo,'Activation(shear)':Acti_shear,'Activation(meta)':Acti_meta}
     """   
     for d in csv.DictReader(open('./Activation(Myo).csv')):
         Test_Pressure2.append(float(d['Pressure']))
