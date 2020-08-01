@@ -336,7 +336,7 @@ def Perfusion_myo():
     Activation_la = []
     # Assumed to be 14 mmHg.
     D = [Diam_la, Diam_sa]
-    Pres = 20  ## For the passive myogenic shear and metabolic case...
+    Pres = 45 ## For the passive myogenic shear and metabolic case...
     Tlac = 100 * 133.33 * Diam_lac * 0.5
     meta_la = ((Cmyo_la * Tlac) - (Cshear_la * 5.5) + Ctonedd_la) / Cmeta_la
     print(meta_la)
@@ -408,6 +408,7 @@ def Perfusion_myo():
 
     # Calculate the normalised perfusion...
     perfusion_norm = [(k / perfuse_100) for k in perfusion]
+    return {'Pressure': Pressure_in, 'Diameter(LA)': Diameter_la, 'Diameter(SA)': Diameter_sa,'Normalised Perfusion': perfusion_norm,'Pressure(LA)':Pressure_la}
     """ 
     # Sat = [Saturation(l) for l in l1]
     # Conc = [Consumption(l) * 1000 for l in l1]

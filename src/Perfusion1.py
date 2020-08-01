@@ -407,6 +407,7 @@ def Perfusion_pass():
     perfusion_norm = [(k / perfuse_100) for k in perfusion]
     # Sat = [Saturation(l) for l in l1]
     # Conc = [Consumption(l) * 1000 for l in l1]
+    return {'Pressure': Pressure_in, 'Diameter(LA)': Diameter_la, 'Diameter(SA)': Diameter_sa,'Normalised Perfusion': perfusion_norm,'Pressure(LA)':Pressure_la}
     """ 
     Test_Pressure = []
     Test_Pressure1 = []

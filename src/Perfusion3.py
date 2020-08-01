@@ -95,7 +95,8 @@ def Perfusion_shear():
         # meta_sa = 4.261014926666667e-06
         lam_D_la = Diam_la / D0_la  # The ratio of diameters...
         lam_D_sa = Diam_sa / D0_sa
-        Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctoned_la - (Cshear_la * shear_la)  # - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
+        Stone_la = (Cmyo_la * (Pmid_la * Diam_la * 0.5)) + Ctoned_la - (
+                    Cshear_la * shear_la)  # - (Cmeta_la * meta_la)  # The stone is the tone of the vessel...
         Stone_sa = (Cmyo_sa * (Pmid_sa * Diam_sa * 0.5)) + Ctoned_sa - (Cshear_sa * shear_sa)  # - (Cmeta_sa * meta_sa)
         Act_la = 1 / (1 + np.exp(-Stone_la))  # The activation of the smooth muscles....
         Act_sa = 1 / (1 + np.exp(-Stone_sa))
@@ -143,9 +144,12 @@ def Perfusion_shear():
         else:
             return Saturation(1.97, *Pw2)
         Aw1 = np.pi * ((n_a * l_a) + (n_la * l_la) + (n_sa * l_sa) + (n_c * l_c))
-        Aw2 = 2 * np.pi * ((n_a * l_a * Diam_a * 0.5) + (n_la * l_la * D1 * 0.5) + (n_sa * l_sa * D2 * 0.5) + (n_c * l_c * Diam_c * 0.5))
-        Aw3 = np.pi * ((n_a * l_a * Diam_a * Diam_a * 0.25) + (n_la * l_la * D1 * D1 * 0.25) + (n_sa * l_sa * D2 * D2 * 0.25) + (n_c * l_c * Diam_c * Diam_c * 0.25))
-        Aw3 = Aw3 + np.pi * ((n_sv * l_sv * Diam_sv * Diam_sv * 0.25) + (n_lv * l_lv * Diam_lv * Diam_lv * 0.25) + (n_v * l_v * Diam_v * Diam_v * 0.25))
+        Aw2 = 2 * np.pi * ((n_a * l_a * Diam_a * 0.5) + (n_la * l_la * D1 * 0.5) + (n_sa * l_sa * D2 * 0.5) + (
+                    n_c * l_c * Diam_c * 0.5))
+        Aw3 = np.pi * ((n_a * l_a * Diam_a * Diam_a * 0.25) + (n_la * l_la * D1 * D1 * 0.25) + (
+                    n_sa * l_sa * D2 * D2 * 0.25) + (n_c * l_c * Diam_c * Diam_c * 0.25))
+        Aw3 = Aw3 + np.pi * ((n_sv * l_sv * Diam_sv * Diam_sv * 0.25) + (n_lv * l_lv * Diam_lv * Diam_lv * 0.25) + (
+                    n_v * l_v * Diam_v * Diam_v * 0.25))
         Aw3 = Aw3 - ((n_c * l_c) / (500 * 1e06))
         depth = (-Aw2 + np.sqrt((Aw2 * Aw2) - (4 * Aw1 * Aw3))) / (2 * Aw1)
         q1 = 0.25 * np.pi * M_0 * (((D + (2 * depth)) * (D + (2 * depth))) - (D * D))
@@ -204,13 +208,17 @@ def Perfusion_shear():
             return C
         else:
             Aw1 = np.pi * ((n_a * l_a) + (n_la * l_la) + (n_sa * l_sa) + (n_c * l_c))
-            Aw2 = 2 * np.pi * ((n_a * l_a * Diam_a * 0.5) + (n_la * l_la * D1 * 0.5) + (n_sa * l_sa * D2 * 0.5) + (n_c * l_c * Diam_c * 0.5))
-            Aw3 = np.pi * ((n_a * l_a * Diam_a * Diam_a * 0.25) + (n_la * l_la * D1 * D1 * 0.25) + (n_sa * l_sa * D2 * D2 * 0.25) + (n_c * l_c * Diam_c * Diam_c * 0.25))
-            Aw3 = Aw3 + np.pi * ((n_sv * l_sv * Diam_sv * Diam_sv * 0.25) + (n_lv * l_lv * Diam_lv * Diam_lv * 0.25) + (n_v * l_v * Diam_v * Diam_v * 0.25))
+            Aw2 = 2 * np.pi * ((n_a * l_a * Diam_a * 0.5) + (n_la * l_la * D1 * 0.5) + (n_sa * l_sa * D2 * 0.5) + (
+                        n_c * l_c * Diam_c * 0.5))
+            Aw3 = np.pi * ((n_a * l_a * Diam_a * Diam_a * 0.25) + (n_la * l_la * D1 * D1 * 0.25) + (
+                        n_sa * l_sa * D2 * D2 * 0.25) + (n_c * l_c * Diam_c * Diam_c * 0.25))
+            Aw3 = Aw3 + np.pi * ((n_sv * l_sv * Diam_sv * Diam_sv * 0.25) + (n_lv * l_lv * Diam_lv * Diam_lv * 0.25) + (
+                        n_v * l_v * Diam_v * Diam_v * 0.25))
             Aw3 = Aw3 - ((n_c * l_c) / (500 * 1e06))
             depth = (-Aw2 + np.sqrt((Aw2 * Aw2) - (4 * Aw1 * Aw3))) / (2 * Aw1)
             q1 = 0.25 * np.pi * M_0 * (((D + (2 * depth)) * (D + (2 * depth))) - (D * D))
-            alpha = ((H_T * R_0) / (4 * k_d)) * ((D * (1 - (R_1 * S_i))) - (((1 - H_D) * R_1 * q1) / ((np.pi) * c0 * H_D * k_d)))
+            alpha = ((H_T * R_0) / (4 * k_d)) * (
+                        (D * (1 - (R_1 * S_i))) - (((1 - H_D) * R_1 * q1) / ((np.pi) * c0 * H_D * k_d)))
             beta = (D * H_T * R_0 * R_1 * q1) / (4 * Q * c0 * H_D * k_d)
             gamma = (k_d * (np.pi) * D) / (0.6 * Q)
             C = alpha + (beta * (X - X_i)) + np.exp(gamma * (X_i - X)) * (C_i - alpha)
@@ -376,7 +384,8 @@ def Perfusion_shear():
     Pressure_la = []
     Pressure_sa = []
     while (k < len(Diameter_la)):
-        gradP_tot = (Pressure_in[k] - 12.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
+        gradP_tot = (Pressure_in[
+                         k] - 12.91) * 133.33  # Pressure converted from mmHg to N/m^2 by multiplying with 133.33
         Resistance_la = compartment_resistance(vis_la, l_la, Diameter_la[k] * 1e-6, n_la)
         Resistance_sa = compartment_resistance(vis_sa, l_sa, Diameter_sa[k] * 1e-6, n_sa)
         Resistance_c = compartment_resistance(vis_c, l_c, Diam_c, n_c)
@@ -408,8 +417,7 @@ def Perfusion_shear():
 
     # Calculate the normalised perfusion...
     perfusion_norm = [(k / perfuse_100) for k in perfusion]
-    # Sat = [Saturation(l) for l in l1]
-    # Conc = [Consumption(l) * 1000 for l in l1]
+    return {'Pressure': Pressure_in, 'Diameter(LA)': Diameter_la, 'Diameter(SA)': Diameter_sa,'Normalised Perfusion': perfusion_norm}
     """ 
     Test_Pressure = []
     Test_Pressure1 = []
