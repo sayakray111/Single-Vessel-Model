@@ -11,12 +11,13 @@ Single Vessel Model documentation
    :caption: Guide:
 Passive Case 
 =============================================================
-.. automodule:: src
+.. currentmodule:: src
 .. autoclass:: Perfusion_pass
    :members: Tension2, Saturation
    :undoc-members:
    :show-inheritance:
-
+.. autoclass:: Perfusion_shear
+   :members: Tension2,Saturation
 
 
 
