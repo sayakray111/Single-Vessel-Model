@@ -36,8 +36,236 @@
 <div class="toctree-wrapper compound">
 </div>
 </div>
-<div class="section" id="passive-case">
-<h1>Passive Case<a class="headerlink" href="#passive-case" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src">
+<span id="passive-case"></span><h1>Passive Case<a class="headerlink" href="#module-src" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="src.Perfusion_pass">
+<em class="property">class </em><code class="sig-prename descclassname">src.</code><code class="sig-name descname">Perfusion_pass</code><a class="headerlink" href="#src.Perfusion_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="src.Perfusion_pass.Consumption">
+<code class="sig-name descname">Consumption</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_pass.Consumption" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The axial distance along the length of the vessel…</p></li>
+<li><p><strong>params2</strong> – tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ATP consumption as a function of the axial distance…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_pass.Consumption2">
+<code class="sig-name descname">Consumption2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params3</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_pass.Consumption2" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The axial distance along the length of the vessel…</p></li>
+<li><p><strong>params3</strong> – tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ATP consumption as a function of the axial distance…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_pass.SCR">
+<code class="sig-name descname">SCR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params4</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_pass.SCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The axial distance along the length of the vessel…</p></li>
+<li><p><strong>params4</strong> – tuple of the constant parameters to the function which helps to calculate the SCR integral stimuli as a function of the axial distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SCR integral stimuli as a function of the axial distance…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_pass.Saturation">
+<code class="sig-name descname">Saturation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_pass.Saturation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Saturation as a function of x based on certain parameters..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – This is the distance along the length of the artery</p></li>
+<li><p><strong>params1</strong> – Tuple of parameters which must be unpacked to release the individual elements.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the saturation as a function of the axial distance along the length of the particular vessel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_pass.Tension2">
+<code class="sig-name descname">Tension2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Diam</span></em>, <em class="sig-param"><span class="n">Pres</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_pass.Tension2" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is input into python routine - fsolve to calculate the Optimum Diameter for a particular pressure…</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Diam</strong> – This is the list which corresponds to the two different diameters of the large and small arteriole.</p></li>
+<li><p><strong>Pres</strong> – This is the pressure corresponding to a particular diameter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the residual of the total tension subtracted from the myogenic tension for both sets of diameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-0">
+<span id="metabolic-case"></span><h1>Metabolic Case<a class="headerlink" href="#module-0" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="src.Perfusion_meta">
+<em class="property">class </em><code class="sig-prename descclassname">src.</code><code class="sig-name descname">Perfusion_meta</code><a class="headerlink" href="#src.Perfusion_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="src.Perfusion_meta.Activation">
+<code class="sig-name descname">Activation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Pres</span></em>, <em class="sig-param"><span class="n">Diam</span></em>, <em class="sig-param"><span class="n">flag</span></em>, <em class="sig-param"><span class="n">flag2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_meta.Activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the activation for a particular set of Pressures and Diameters..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Pres</strong> – <dl class="field-list simple">
+<dt class="field-odd">type float</dt>
+<dd class="field-odd"><p>This is the pressure which is input into the system for which the diameter is to be calculated..</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>Diam</strong> – <dl class="field-list simple">
+<dt class="field-odd">type float</dt>
+<dd class="field-odd"><p>This is the Diameter list which is to be input into the system</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>flag</strong> – <dl class="field-list simple">
+<dt class="field-odd">type int</dt>
+<dd class="field-odd"><p>1 or 2 to distinguish between large and small arteriole…</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>flag2</strong> – <dl class="field-list simple">
+<dt class="field-odd">type int</dt>
+<dd class="field-odd"><p>1 or 2 or 3 or 4 for all cases, myogenic case, shear case and metabolic case…</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns Activation</dt>
+<dd class="field-even"><dl class="field-list simple">
+<dt class="field-odd">rtype float</dt>
+<dd class="field-odd"><p>The function also returns the metabolic/myogenic/shear stimuli for flag2=2/3/4 and flag = 1/2 for large and small arteriole.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_meta.Consumption">
+<code class="sig-name descname">Consumption</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_meta.Consumption" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The axial distance along the length of the vessel…</p></li>
+<li><p><strong>params2</strong> – tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ATP consumption as a function of the axial distance…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_meta.Consumption2">
+<code class="sig-name descname">Consumption2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params3</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_meta.Consumption2" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The axial distance along the length of the vessel…</p></li>
+<li><p><strong>params3</strong> – tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ATP consumption as a function of the axial distance…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_meta.SCR">
+<code class="sig-name descname">SCR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params4</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_meta.SCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The axial distance along the length of the vessel…</p></li>
+<li><p><strong>params4</strong> – tuple of the constant parameters to the function which helps to calculate the SCR integral stimuli as a function of the axial distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SCR integral stimuli as a function of the axial distance…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_meta.Saturation">
+<code class="sig-name descname">Saturation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_meta.Saturation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Saturation as a function of x based on certain parameters..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – This is the distance along the length of the artery</p></li>
+<li><p><strong>params1</strong> – Tuple of parameters which must be unpacked to release the individual elements.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the saturation as a function of the axial distance along the length of the particular vessel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.Perfusion_meta.Tension2">
+<code class="sig-name descname">Tension2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Diam</span></em>, <em class="sig-param"><span class="n">Pres</span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.Perfusion_meta.Tension2" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is input into python routine - fsolve to calculate the Optimum Diameter for a particular pressure…</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Diam</strong> – This is the list which corresponds to the two different diameters of the large and small arteriole.</p></li>
+<li><p><strong>Pres</strong> – This is the pressure corresponding to a particular diameter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the residual of the total tension subtracted from the myogenic tension for both sets of diameters. In the form of a tuple of floats.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

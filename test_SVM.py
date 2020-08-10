@@ -176,7 +176,6 @@ def plot_perfusion1():
     plt.show()
 
 
-plot_perfusion1()
 
 
 

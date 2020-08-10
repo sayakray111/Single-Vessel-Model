@@ -144,8 +144,12 @@ class Perfusion_pass():
     def Tension2(self,Diam,Pres):
         """
         This function is input into python routine - fsolve to calculate the Optimum Diameter for a particular pressure...
+
         :param Diam: This is the list which corresponds to the two different diameters of the large and small arteriole.
-        :return: returns the residual of the total tension subtracted from the myogenic tension for both sets of diameters.
+
+        :param Pres: This is the pressure corresponding to a particular diameter
+
+        :return: Returns the residual of the total tension subtracted from the myogenic tension for both sets of diameters.
         """
         # calculate the value of Q to be used for the evaluation of shear stress
         Q_tot = 0
@@ -225,8 +229,11 @@ class Perfusion_pass():
     def Saturation(self,x, *params1):
         """
         This function calculates the Saturation as a function of x based on certain parameters..
+
         :param x: This is the distance along the length of the artery
+
         :param params1: Tuple of parameters which must be unpacked to release the individual elements.
+
         :return: Returns the saturation as a function of the axial distance along the length of the particular vessel.
         """
         D1, D2, Q_tot = params1
@@ -270,9 +277,12 @@ class Perfusion_pass():
     def Consumption(self,x, *params2):
         """
         This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.
+
         :param x: The axial distance along the length of the vessel...
+
         :param params2: tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.
-        :return: ATP consumtion as a function of the axial distance...
+
+        :return: ATP consumption as a function of the axial distance...
         """
         D1, D2, Q_tot = params2
         Pw = (D1, D2, Q_tot)
@@ -335,10 +345,13 @@ class Perfusion_pass():
     # Function inside integral
     def Consumption2(self,x, *params3):
         """
-        This function calculates the
-        :param x:
-        :param params3:
-        :return:
+        This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.
+
+        :param x: The axial distance along the length of the vessel...
+
+        :param params3: tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.
+
+        :return: ATP consumption as a function of the axial distance...
         """
         x11, D1, D2, Q_tot = params3
         params2 = (D1, D2, Q_tot)
@@ -347,6 +360,15 @@ class Perfusion_pass():
 
     # This function calculates the SCR value for each segment...
     def SCR(self,x, *params4):
+        """
+        This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.
+
+        :param x: The axial distance along the length of the vessel...
+
+        :param params4: tuple of the constant parameters to the function which helps to calculate the SCR integral stimuli as a function of the axial distance.
+
+        :return: SCR integral stimuli as a function of the axial distance...
+        """
         x1 = x * 1e-2
         params41 = (x1, *params4)
         SCR1, error = integrate.quad(self.Consumption2, x1, self.xend_lv, args=params41)

@@ -143,8 +143,18 @@ class Perfusion_meta():
 
 
 
-    # This function is input into fsolve to calculate the Optimum Diameter for a particular pressure....
+
     def Tension2(self,Diam,Pres):
+        """
+        This function is input into python routine - fsolve to calculate the Optimum Diameter for a particular pressure...
+
+        :param Diam: This is the list which corresponds to the two different diameters of the large and small arteriole.
+
+        :param Pres: This is the pressure corresponding to a particular diameter
+
+        :return: Returns the residual of the total tension subtracted from the myogenic tension for both sets of diameters. In the form of a tuple of floats.
+
+        """
         Diam_la = Diam[0]
         Diam_sa = Diam[1]
         # Determine which diameter is which....
@@ -209,6 +219,19 @@ class Perfusion_meta():
         return (Ttot_la) - (Pmid_la * Diam_la * 0.5), (Ttot_sa) - (Pmid_sa * Diam_sa * 0.5)
 
     def Activation(self,Pres, Diam, flag, flag2):
+        """
+        This function calculates the activation for a particular set of Pressures and Diameters..
+
+        :param Pres: :type float: This is the pressure which is input into the system for which the diameter is to be calculated..
+
+        :param Diam: :type float: This is the Diameter list which is to be input into the system
+
+        :param flag: :type int: 1 or 2 to distinguish between large and small arteriole...
+
+        :param flag2: :type int: 1 or 2 or 3 or 4 for all cases, myogenic case, shear case and metabolic case...
+
+        :returns Activation: :rtype float: The function also returns the metabolic/myogenic/shear stimuli for flag2=2/3/4 and flag = 1/2 for large and small arteriole.
+        """
         Diam_la = Diam[0]
         Diam_sa = Diam[1]
         # Determine which diameter is which....
@@ -277,6 +300,16 @@ class Perfusion_meta():
 
     # This function returns the saturation of Oxygen as a function of length....
     def Saturation(self,x, *params1):
+        """
+                This function calculates the Saturation as a function of x based on certain parameters..
+
+                :param x: This is the distance along the length of the artery
+
+                :param params1: Tuple of parameters which must be unpacked to release the individual elements.
+
+                :return: Returns the saturation as a function of the axial distance along the length of the particular vessel.
+
+                """
         D1, D2, Q_tot = params1
         Pw2 = (D1, D2, Q_tot)
         if (0 < x <= 0.61):
@@ -316,6 +349,16 @@ class Perfusion_meta():
 
     # This calculates the consumption of ATP as a function of x(distance along the length of the vessel)
     def Consumption(self,x, *params2):
+        """
+                This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.
+
+                :param x: The axial distance along the length of the vessel...
+
+                :param params2: tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.
+
+                :return: ATP consumption as a function of the axial distance...
+
+                """
         D1, D2, Q_tot = params2
         Pw = (D1, D2, Q_tot)
         X = x * 1e-2
@@ -376,6 +419,16 @@ class Perfusion_meta():
 
     # Function inside integral
     def Consumption2(self,x, *params3):
+        """
+                This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.
+
+                :param x: The axial distance along the length of the vessel...
+
+                :param params3: tuple of the constant parameters to the function which helps to calculate the ATP Consumption as a function of the axial distance.
+
+                :return: ATP consumption as a function of the axial distance...
+
+                """
         x11, D1, D2, Q_tot = params3
         params2 = (D1, D2, Q_tot)
         C = np.exp(-(x - x11) / (self.L_0)) * self.Consumption(x * 100, *params2)
@@ -383,6 +436,16 @@ class Perfusion_meta():
 
     # This function calculates the SCR value for each segment...
     def SCR(self,x, *params4):
+        """
+                This function calculates the Consumption as a function of axial distance along the length of the artery or vessel.
+
+                :param x: The axial distance along the length of the vessel...
+
+                :param params4: tuple of the constant parameters to the function which helps to calculate the SCR integral stimuli as a function of the axial distance.
+
+                :return: SCR integral stimuli as a function of the axial distance...
+
+                """
         x1 = x * 1e-2
         params41 = (x1, *params4)
         SCR1, error = integrate.quad(self.Consumption2, x1, self.xend_lv, args=params41)
